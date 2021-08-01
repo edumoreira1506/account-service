@@ -1,4 +1,4 @@
-# cig-service-template
+# account-service
 
 ## Dependencies
 
@@ -12,8 +12,8 @@ Postgres >= 13
 Clone the project.
 
 ```console
-$ git clone git@github.com:edumoreira1506/cig-service-template.git
-$ cd cig-service-template
+$ git clone git@github.com:edumoreira1506/account-service.git
+$ cd account-service
 ```
 
 Copy the contents of the `.env.sample` to `.env` then change with the credentials of your local environment.
