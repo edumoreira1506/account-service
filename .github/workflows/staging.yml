@@ -13,5 +13,5 @@ jobs:
       - uses: akhileshns/heroku-deploy@v3.12.12
         with:
           heroku_api_key: ${{secrets.HEROKU_API_KEY}}
-          heroku_app_name: "account-service"
+          heroku_app_name: "cig-account-service"
           heroku_email: "contato@eduardoem.com.br"
