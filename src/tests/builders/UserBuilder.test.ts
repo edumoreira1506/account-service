@@ -1,4 +1,5 @@
 import UserBuilder from '@Builders/UserBuilder'
+
 import userFactory from '../factories/userFactory'
 
 describe('UserBuilder', () => {

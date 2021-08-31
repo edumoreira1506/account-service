@@ -15,7 +15,7 @@ export default function userFactory({
   password: faker.internet.password(),
   name: faker.name.findName(),
   birthDate: faker.date.past(),
-  register: `${faker.datatype.number(999)}.${faker.datatype.number(999)}.${faker.datatype.number(999)}-${faker.datatype.number(99)}`
+  register: `${faker.datatype.number({ min: 100, max: 999 })}.${faker.datatype.number({ min: 100, max: 999 })}.${faker.datatype.number({ min: 100, max: 999 })}-${faker.datatype.number({ min: 10, max: 99 })}`
 }): User {
   const confirmPassword = password
 
