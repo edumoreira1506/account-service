@@ -53,7 +53,7 @@ export default class UserBuilder {
 
     if (isDuplicatedEmail) throw new ValidationError(i18n.__('user.errors.duplicated-email'))
 
-    const userOfRegister = await this._repository.findByRegister(this._email)
+    const userOfRegister = await this._repository.findByRegister(this._register)
     const isDuplicatedRegister = Boolean(userOfRegister)
 
     if (isDuplicatedRegister) throw new ValidationError(i18n.__('user.errors.duplicated-register'))
