@@ -1,7 +1,15 @@
 import { createDoc } from '@cig-platform/docs'
-import { storeUserSchema } from '@Schemas/UserSchemas'
+import { authUserSchema, storeUserSchema } from '@Schemas/UserSchemas'
 
 const userDocs = {
+  ...createDoc('/auth', ['Users'], [
+    {
+      method: 'post',
+      title: 'Auth user',
+      description: '',
+      objectSchema: authUserSchema
+    }
+  ]),
   ...createDoc('/users', ['Users'], [
     {
       method: 'post',

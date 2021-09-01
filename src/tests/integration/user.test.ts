@@ -1,9 +1,11 @@
 import request from 'supertest'
+import typeorm from 'typeorm'
 
 import App from '@Configs/server'
 import i18n from '@Configs/i18n'
 
 import userFactory from '../factories/userFactory'
+import EncryptService from '@Services/EncryptService'
 
 jest.mock('typeorm', () => ({
   createConnection: jest.fn().mockResolvedValue({}),
@@ -33,7 +35,10 @@ describe('User actions', () => {
       })
 
       expect(response.statusCode).toBe(200)
-      expect(response.body.message).toBe(i18n.__('messages.success'))
+      expect(response.body).toMatchObject({
+        message: i18n.__('messages.success'),
+        ok: true,
+      })
     })
 
     it('is a invalid user when has no email', async () => {
@@ -154,6 +159,71 @@ describe('User actions', () => {
         error: {
           name: 'ValidationError',
           message: 'Data de nascimento precisa ser uma data'
+        }
+      })
+    })
+  })
+
+  describe('Authentication', () => {
+    it('is valid user credentials', async () => {
+      const user = userFactory()
+
+      typeorm.getCustomRepository = jest.fn().mockReturnValue({
+        findByEmail: jest.fn().mockResolvedValue({ ...user, password: EncryptService.hash(user.password) }),
+      })
+
+      const response = await request(App).post('/v1/auth').send({
+        email: user.email,
+        password: user.password
+      })
+
+      expect(response.statusCode).toBe(200)
+      expect(response.body).toMatchObject({
+        ok: true,
+        message: i18n.__('messages.success-login'),
+      })
+    })
+
+    it('is invalid user credentials when email does not exist', async () => {
+      const user = userFactory()
+
+      typeorm.getCustomRepository = jest.fn().mockReturnValue({
+        findByEmail: jest.fn().mockResolvedValue(null),
+      })
+
+      const response = await request(App).post('/v1/auth').send({
+        email: user.email,
+        password: user.password
+      })
+
+      expect(response.statusCode).toBe(400)
+      expect(response.body).toMatchObject({
+        ok: false,
+        error: {
+          name: 'AuthError',
+          message: 'E-mail ou senha inválido'
+        }
+      })
+    })
+
+    it('is invalid user credentials when password does not match', async () => {
+      const user = userFactory()
+
+      typeorm.getCustomRepository = jest.fn().mockReturnValue({
+        findByEmail: jest.fn().mockResolvedValue({ ...user, password: EncryptService.hash(user.password) }),
+      })
+
+      const response = await request(App).post('/v1/auth').send({
+        email: user.email,
+        password: 'wrong password'
+      })
+
+      expect(response.statusCode).toBe(400)
+      expect(response.body).toMatchObject({
+        ok: false,
+        error: {
+          name: 'AuthError',
+          message: 'E-mail ou senha inválido'
         }
       })
     })
