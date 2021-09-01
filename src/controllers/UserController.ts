@@ -28,7 +28,7 @@ class UserController extends BaseController<User, UserRepository>  {
 
     const user = await this.repository.save(userDTO)
 
-    return res.send({ message: i18n.__('messages.success'), user })
+    return res.send({ ok: true, message: i18n.__('messages.success'), user })
   }
 
   @BaseController.errorHandler()
@@ -38,7 +38,7 @@ class UserController extends BaseController<User, UserRepository>  {
 
     const token = await AuthService.login(email, password, this.repository)
     
-    return res.send({ message: i18n.__('messages.success-login'),  token })
+    return res.send({ ok: true, message: i18n.__('messages.success-login'),  token })
   }
 }
 
