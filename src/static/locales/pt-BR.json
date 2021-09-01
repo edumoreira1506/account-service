@@ -6,6 +6,7 @@
 	"must-be-equal": "{{field1}} precisa ser igual ao {{field2}}",
 	"messages.success": "Cadastrado com sucesso!",
 	"messages.success-login": "Logado com sucesso!",
+	"messages.updated": "Atualizado com sucesso!",
 	"app.title": "Account Service",
 	"app.description": "Documentação da API",
 	"user.fields.email": "E-mail",
@@ -18,5 +19,6 @@
 	"user.errors.duplicated-email": "E-mail já está em uso",
 	"user.errors.duplicated-register": "CPF já está em uso",
 	"user.errors.invalid-register": "Formato do CPF inválido",
-	"auth.errors.invalid-login": "E-mail ou senha inválido"
+	"auth.errors.invalid-login": "E-mail ou senha inválido",
+	"errors.not-found": "Recurso não encontrado"
 }

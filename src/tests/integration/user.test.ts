@@ -169,7 +169,7 @@ describe('User actions', () => {
       const user = userFactory()
 
       typeorm.getCustomRepository = jest.fn().mockReturnValue({
-        findByEmail: jest.fn().mockResolvedValue({ ...user, password: EncryptService.hash(user.password) }),
+        findByEmail: jest.fn().mockResolvedValue({ ...user, password: EncryptService.encrypt(user.password) }),
       })
 
       const response = await request(App).post('/v1/auth').send({
@@ -210,7 +210,7 @@ describe('User actions', () => {
       const user = userFactory()
 
       typeorm.getCustomRepository = jest.fn().mockReturnValue({
-        findByEmail: jest.fn().mockResolvedValue({ ...user, password: EncryptService.hash(user.password) }),
+        findByEmail: jest.fn().mockResolvedValue({ ...user, password: EncryptService.encrypt(user.password) }),
       })
 
       const response = await request(App).post('/v1/auth').send({

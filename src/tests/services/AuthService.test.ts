@@ -20,7 +20,7 @@ describe('AuthService', () => {
 
       const user = userFactory()
       const fakeUserRepository: any = {
-        findByEmail: jest.fn().mockResolvedValue({ ...user, password: EncryptService.hash(user.password) })
+        findByEmail: jest.fn().mockResolvedValue({ ...user, password: EncryptService.encrypt(user.password) })
       }
 
       expect(await AuthService.login(user.email, user.password, fakeUserRepository)).toBe(token)
@@ -38,7 +38,7 @@ describe('AuthService', () => {
     it('trigger an error when password does not match', async () => {
       const user = userFactory()
       const fakeUserRepository: any = {
-        findByEmail: jest.fn().mockResolvedValue({ ...user, password: EncryptService.hash(user.password) })
+        findByEmail: jest.fn().mockResolvedValue({ ...user, password: EncryptService.encrypt(user.password) })
       }
 
       await expect(AuthService.login(user.email, 'wrong password', fakeUserRepository)).rejects.toThrow(i18n.__('auth.errors.invalid-login'))
