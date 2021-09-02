@@ -10,11 +10,18 @@ export default class UserBuilder {
   private _email = '';
   private _password = '';
   private _register = '';
+  private _id: undefined | string = undefined;
   private _birthDate: Date;
   private _repository: UserRepository;
 
   constructor(userRepository: UserRepository) {
     this._repository = userRepository
+  }
+
+  setId(id: string): UserBuilder {
+    this._id = id
+
+    return this
   }
 
   setRegister(register: string): UserBuilder {
@@ -49,18 +56,18 @@ export default class UserBuilder {
 
   async validate(): Promise<void> {
     const userOfEmail = await this._repository.findByEmail(this._email)
-    const isDuplicatedEmail = Boolean(userOfEmail)
+    const isDuplicatedEmail = Boolean(userOfEmail) && userOfEmail?.id !== this._id
 
     if (isDuplicatedEmail) throw new ValidationError(i18n.__('user.errors.duplicated-email'))
 
     const userOfRegister = await this._repository.findByRegister(this._register)
-    const isDuplicatedRegister = Boolean(userOfRegister)
+    const isDuplicatedRegister = Boolean(userOfRegister) && userOfRegister?.id !== this._id
 
     if (isDuplicatedRegister) throw new ValidationError(i18n.__('user.errors.duplicated-register'))
   }
 
   encryptPassword(): void {
-    this._password = EncryptService.hash(this._password)
+    this._password = EncryptService.encrypt(this._password)
   }
 
   build = async (): Promise<User> => {

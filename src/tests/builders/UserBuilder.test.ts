@@ -44,5 +44,45 @@ describe('UserBuilder', () => {
 
       await expect(userBuilder.build).rejects.toThrow('CPF já está em uso')
     })
+
+    it('a valid user when is the same user returned by findByEmail', async () => {
+      const user = userFactory()
+      const fakeRepository: any = {
+        findByEmail: jest.fn().mockResolvedValue(user),
+        findByRegister: jest.fn().mockResolvedValue(null)
+      }
+      const userBuilder = new UserBuilder(fakeRepository)
+        .setName(user.name)
+        .setPassword(user.password)
+        .setEmail(user.email)
+        .setRegister(user.register)
+        .setId(user.id)
+
+      expect(await userBuilder.build()).toMatchObject({
+        name: user.name,
+        email: user.email,
+        register: user.register
+      })
+    })
+
+    it('a valid user when is the same user returned by findByRegister', async () => {
+      const user = userFactory()
+      const fakeRepository: any = {
+        findByEmail: jest.fn().mockResolvedValue(null),
+        findByRegister: jest.fn().mockResolvedValue(user)
+      }
+      const userBuilder = new UserBuilder(fakeRepository)
+        .setName(user.name)
+        .setPassword(user.password)
+        .setEmail(user.email)
+        .setRegister(user.register)
+        .setId(user.id)
+
+      expect(await userBuilder.build()).toMatchObject({
+        name: user.name,
+        email: user.email,
+        register: user.register
+      })
+    })
   })
 })

@@ -9,7 +9,7 @@ export default class AuthService {
 
     if (!user) throw new AuthError()
 
-    const isValidPassword = await EncryptService.check(password, user.password)
+    const isValidPassword = EncryptService.check(password, user.password)
 
     if (!isValidPassword) throw new AuthError()
 

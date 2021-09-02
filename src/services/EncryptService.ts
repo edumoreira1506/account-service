@@ -1,11 +1,20 @@
-import bcrypt from 'bcrypt'
+import CryptoJS from 'crypto-js'
+
+import { ENCRYPT_KEY } from '@Constants/encrypt'
 
 export default class EncryptService {
-  static hash(originalString: string): string {
-    return bcrypt.hashSync(originalString, 8)
+  static encrypt(originalString: string) {
+    return CryptoJS.AES.encrypt(originalString, ENCRYPT_KEY).toString()
   }
 
-  static async check(originalString: string, encryptedString: string): Promise<boolean> {
-    return await bcrypt.compare(originalString, encryptedString)
+  static decrypt(encryptedString: string) {
+    const bytes  = CryptoJS.AES.decrypt(encryptedString, ENCRYPT_KEY)
+    const originalText = bytes.toString(CryptoJS.enc.Utf8)
+
+    return originalText
+  }
+
+  static check(originalString: string, encryptedString: string) {
+    return originalString === EncryptService.decrypt(encryptedString)
   }
 }
