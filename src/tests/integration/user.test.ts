@@ -168,7 +168,7 @@ describe('User actions', () => {
     it('is valid user credentials', async () => {
       const user = userFactory()
 
-      typeorm.getCustomRepository = jest.fn().mockReturnValue({
+      jest.spyOn(typeorm, 'getCustomRepository').mockReturnValue({
         findByEmail: jest.fn().mockResolvedValue({ ...user, password: EncryptService.encrypt(user.password) }),
       })
 
@@ -187,7 +187,7 @@ describe('User actions', () => {
     it('is invalid user credentials when email does not exist', async () => {
       const user = userFactory()
 
-      typeorm.getCustomRepository = jest.fn().mockReturnValue({
+      jest.spyOn(typeorm, 'getCustomRepository').mockReturnValue({
         findByEmail: jest.fn().mockResolvedValue(null),
       })
 
@@ -209,7 +209,7 @@ describe('User actions', () => {
     it('is invalid user credentials when password does not match', async () => {
       const user = userFactory()
 
-      typeorm.getCustomRepository = jest.fn().mockReturnValue({
+      jest.spyOn(typeorm, 'getCustomRepository').mockReturnValue({
         findByEmail: jest.fn().mockResolvedValue({ ...user, password: EncryptService.encrypt(user.password) }),
       })
 
