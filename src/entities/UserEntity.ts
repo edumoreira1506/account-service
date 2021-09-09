@@ -20,4 +20,7 @@ export default class User {
 
   @Column({ type: 'date', name: 'birth_date' })
   birthDate: Date;
+
+  @Column('boolean')
+  active: boolean;
 }
