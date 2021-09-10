@@ -443,4 +443,55 @@ describe('User actions', () => {
       })
     })
   })
+
+  describe('Remove', () => {
+    it('returns an error when user does not exist', async () => {
+      const user = userFactory()
+      const fakeUserRepository: any = {
+        findById: jest.fn().mockResolvedValue(null),
+        findByEmail: jest.fn().mockResolvedValue(null),
+        findByRegister: jest.fn().mockResolvedValue(null),
+        save: jest.fn(),
+        update: jest.fn(),
+        updateById: jest.fn(),
+      }
+
+      jest.spyOn(UserController, 'repository', 'get').mockReturnValue(fakeUserRepository)
+
+      const response = await request(App).delete(`/v1/users/${user.id}`)
+
+      expect(fakeUserRepository.updateById).not.toHaveBeenCalled()
+      expect(response.statusCode).toBe(400)
+      expect(response.body).toMatchObject({
+        ok: false,
+        error: {
+          message: 'Recurso não encontrado',
+          name: 'NotFoundError'
+        }
+      })
+    })
+
+    it('updates the active field', async () => {
+      const user = userFactory()
+      const fakeUserRepository: any = {
+        findById: jest.fn().mockResolvedValue(user),
+        findByEmail: jest.fn().mockResolvedValue(user),
+        findByRegister: jest.fn().mockResolvedValue(user),
+        save: jest.fn(),
+        update: jest.fn(),
+        updateById: jest.fn(),
+      }
+
+      jest.spyOn(UserController, 'repository', 'get').mockReturnValue(fakeUserRepository)
+
+      const response = await request(App).delete(`/v1/users/${user.id}`)
+
+      expect(fakeUserRepository.updateById).toHaveBeenCalledWith(user.id, { active: false })
+      expect(response.statusCode).toBe(200)
+      expect(response.body).toMatchObject({
+        ok: true,
+        message: 'Removido com sucesso!'
+      })
+    })
+  })
 })
