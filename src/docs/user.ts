@@ -27,6 +27,11 @@ const userDocs = {
       method: 'delete',
       title: 'Delete user',
       pathVariables: [{ type: 'string', name: 'userId' }]
+    },
+    {
+      method: 'get',
+      title: 'Get user',
+      pathVariables: [{ type: 'string', name: 'userId' }]
     }
   ])
 }
