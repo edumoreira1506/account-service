@@ -21,5 +21,6 @@
 	"user.errors.duplicated-register": "CPF já está em uso",
 	"user.errors.invalid-register": "Formato do CPF inválido",
 	"auth.errors.invalid-login": "E-mail ou senha inválido",
-	"errors.not-found": "Recurso não encontrado"
+	"errors.not-found": "Recurso não encontrado",
+	"required-invalid-email": "required-invalid-email"
 }
