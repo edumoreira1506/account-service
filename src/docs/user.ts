@@ -1,4 +1,4 @@
-import { createDoc } from '@cig-platform/docs'
+import createDoc from '@cig-platform/docs/build/docs/createDoc'
 import { authUserSchema, storeUserSchema, updateUserSchema } from '@Schemas/UserSchemas'
 
 const userDocs = {
@@ -6,7 +6,7 @@ const userDocs = {
     {
       method: 'post',
       title: 'Auth user',
-      objectSchema: authUserSchema
+      objectSchema: authUserSchema,
     }
   ]),
   ...createDoc('/users', ['Users'], [
@@ -21,19 +21,18 @@ const userDocs = {
       method: 'patch',
       title: 'Update user',
       objectSchema: updateUserSchema,
-      pathVariables: [{ type: 'string', name: 'userId' }]
     },
     {
       method: 'delete',
       title: 'Delete user',
-      pathVariables: [{ type: 'string', name: 'userId' }]
     },
     {
       method: 'get',
       title: 'Get user',
-      pathVariables: [{ type: 'string', name: 'userId' }]
     }
-  ])
+  ], {
+    pathVariables: [{ type: 'string', name: 'userId' }]
+  })
 }
 
 export default userDocs
