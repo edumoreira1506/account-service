@@ -7,6 +7,7 @@
 	"messages.success": "Cadastrado com sucesso!",
 	"messages.success-login": "Logado com sucesso!",
 	"messages.updated": "Atualizado com sucesso!",
+	"messages.removed": "Removido com sucesso!",
 	"app.title": "Account Service",
 	"app.description": "Documentação da API",
 	"user.fields.email": "E-mail",
@@ -20,5 +21,6 @@
 	"user.errors.duplicated-register": "CPF já está em uso",
 	"user.errors.invalid-register": "Formato do CPF inválido",
 	"auth.errors.invalid-login": "E-mail ou senha inválido",
-	"errors.not-found": "Recurso não encontrado"
+	"errors.not-found": "Recurso não encontrado",
+	"required-invalid-email": "required-invalid-email"
 }

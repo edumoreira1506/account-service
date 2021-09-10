@@ -72,7 +72,7 @@ describe('User actions', () => {
         ok: false,
         error: {
           name: 'ValidationError',
-          message: 'E-mail é obrigatório'
+          message: i18n.__('required-field', { field: i18n.__('user.fields.email') })
         }
       })
     })
@@ -91,7 +91,7 @@ describe('User actions', () => {
         ok: false,
         error: {
           name: 'ValidationError',
-          message: 'Senha é obrigatório. Confirmação de senha é obrigatório'
+          message: `${i18n.__('required-field', { field: i18n.__('user.fields.password') })}. ${i18n.__('required-field', { field: i18n.__('user.fields.confirm-password') })}`
         }
       })
     })
@@ -112,7 +112,10 @@ describe('User actions', () => {
         ok: false,
         error: {
           name: 'ValidationError',
-          message: 'Senha precisa ser igual ao confirmação de senha'
+          message: i18n.__('must-be-equal', {
+            field1: i18n.__('user.fields.password'),
+            field2: i18n.__('user.fields.confirm-password').toLowerCase()
+          })
         }
       })
     })
@@ -132,7 +135,7 @@ describe('User actions', () => {
         ok: false,
         error: {
           name: 'ValidationError',
-          message: 'Nome é obrigatório'
+          message: i18n.__('required-field', { field: i18n.__('user.fields.name') })
         }
       })
     })
@@ -153,7 +156,7 @@ describe('User actions', () => {
         ok: false,
         error: {
           name: 'ValidationError',
-          message: 'Formato do CPF inválido'
+          message: i18n.__('user.errors.invalid-register')
         }
       })
     })
@@ -174,7 +177,7 @@ describe('User actions', () => {
         ok: false,
         error: {
           name: 'ValidationError',
-          message: 'Data de nascimento precisa ser uma data'
+          message:  i18n.__('invalid-date', { field: i18n.__('user.fields.birth-date') })
         }
       })
     })
@@ -217,7 +220,7 @@ describe('User actions', () => {
         ok: false,
         error: {
           name: 'AuthError',
-          message: 'E-mail ou senha inválido'
+          message: i18n.__('auth.errors.invalid-login')
         }
       })
     })
@@ -239,7 +242,7 @@ describe('User actions', () => {
         ok: false,
         error: {
           name: 'AuthError',
-          message: 'E-mail ou senha inválido'
+          message: i18n.__('auth.errors.invalid-login')
         }
       })
     })
@@ -359,7 +362,7 @@ describe('User actions', () => {
         ok: false,
         error: {
           name: 'ValidationError',
-          message: 'E-mail precisa ser um e-mail'
+          message: i18n.__('invalid-email', { field: i18n.__('user.fields.email') })
         }
       })
     })
@@ -386,7 +389,10 @@ describe('User actions', () => {
         ok: false,
         error: {
           name: 'ValidationError',
-          message: 'Senha precisa ser igual ao confirmação de senha'
+          message: i18n.__('must-be-equal', {
+            field1: i18n.__('user.fields.password'),
+            field2: i18n.__('user.fields.confirm-password').toLowerCase()
+          })
         }
       })
     })
@@ -412,7 +418,7 @@ describe('User actions', () => {
         ok: false,
         error: {
           name: 'ValidationError',
-          message: 'Formato do CPF inválido'
+          message: i18n.__('user.errors.invalid-register')
         }
       })
     })
@@ -438,8 +444,59 @@ describe('User actions', () => {
         ok: false,
         error: {
           name: 'ValidationError',
-          message: 'Data de nascimento precisa ser uma data'
+          message: i18n.__('invalid-date', { field: i18n.__('user.fields.birth-date') })
         }
+      })
+    })
+  })
+
+  describe('Remove', () => {
+    it('returns an error when user does not exist', async () => {
+      const user = userFactory()
+      const fakeUserRepository: any = {
+        findById: jest.fn().mockResolvedValue(null),
+        findByEmail: jest.fn().mockResolvedValue(null),
+        findByRegister: jest.fn().mockResolvedValue(null),
+        save: jest.fn(),
+        update: jest.fn(),
+        updateById: jest.fn(),
+      }
+
+      jest.spyOn(UserController, 'repository', 'get').mockReturnValue(fakeUserRepository)
+
+      const response = await request(App).delete(`/v1/users/${user.id}`)
+
+      expect(fakeUserRepository.updateById).not.toHaveBeenCalled()
+      expect(response.statusCode).toBe(400)
+      expect(response.body).toMatchObject({
+        ok: false,
+        error: {
+          message: i18n.__('errors.not-found'),
+          name: 'NotFoundError'
+        }
+      })
+    })
+
+    it('updates the active field', async () => {
+      const user = userFactory()
+      const fakeUserRepository: any = {
+        findById: jest.fn().mockResolvedValue(user),
+        findByEmail: jest.fn().mockResolvedValue(user),
+        findByRegister: jest.fn().mockResolvedValue(user),
+        save: jest.fn(),
+        update: jest.fn(),
+        updateById: jest.fn(),
+      }
+
+      jest.spyOn(UserController, 'repository', 'get').mockReturnValue(fakeUserRepository)
+
+      const response = await request(App).delete(`/v1/users/${user.id}`)
+
+      expect(fakeUserRepository.updateById).toHaveBeenCalledWith(user.id, { active: false })
+      expect(response.statusCode).toBe(200)
+      expect(response.body).toMatchObject({
+        ok: true,
+        message: i18n.__('messages.removed')
       })
     })
   })

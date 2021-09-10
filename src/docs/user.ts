@@ -22,6 +22,11 @@ const userDocs = {
       title: 'Update user',
       objectSchema: updateUserSchema,
       pathVariables: [{ type: 'string', name: 'userId' }]
+    },
+    {
+      method: 'delete',
+      title: 'Delete user',
+      pathVariables: [{ type: 'string', name: 'userId' }]
     }
   ])
 }

@@ -1,4 +1,5 @@
 import UserBuilder from '@Builders/UserBuilder'
+import i18n from '@Configs/i18n'
 
 import userFactory from '../factories/userFactory'
 
@@ -31,7 +32,7 @@ describe('UserBuilder', () => {
       }
       const userBuilder = new UserBuilder(fakeRepository)
 
-      await expect(userBuilder.build).rejects.toThrow('E-mail já está em uso')
+      await expect(userBuilder.build).rejects.toThrow(i18n.__('user.errors.duplicated-email'))
     })
 
     it('a invalid user when is a duplicated register', async () => {
@@ -42,7 +43,7 @@ describe('UserBuilder', () => {
       }
       const userBuilder = new UserBuilder(fakeRepository)
 
-      await expect(userBuilder.build).rejects.toThrow('CPF já está em uso')
+      await expect(userBuilder.build).rejects.toThrow(i18n.__('user.errors.duplicated-register'))
     })
 
     it('a valid user when is the same user returned by findByEmail', async () => {
