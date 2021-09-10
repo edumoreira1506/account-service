@@ -9,8 +9,8 @@
 		"start": "node build/index.js",
 		"typeorm": "ts-node -r tsconfig-paths/register ./node_modules/.bin/typeorm",
 		"db:migrate": "npm run typeorm migration:run",
-		"db:schema:sync": "yarn typeorm schema:sync",
-		"db:schema:drop": "yarn typeorm schema:drop",
+		"db:schema:sync": "npm run typeorm schema:sync",
+		"db:schema:drop": "npm run typeorm schema:drop",
 		"lint": "eslint .",
 		"test": "jest"
 	},
@@ -21,7 +21,7 @@
 	"homepage": "",
 	"dependencies": {
 		"@cig-platform/core": "^0.2.8",
-		"@cig-platform/docs": "^0.3.3",
+		"@cig-platform/docs": "^0.4.3",
 		"cors": "^2.8.5",
 		"crypto-js": "^4.1.1",
 		"dotenv": "^10.0.0",

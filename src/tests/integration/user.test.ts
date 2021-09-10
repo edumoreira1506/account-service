@@ -500,4 +500,56 @@ describe('User actions', () => {
       })
     })
   })
+
+  describe('Get', () => {
+    it('returns an error when user does not exist', async () => {
+      const user = userFactory()
+      const fakeUserRepository: any = {
+        findById: jest.fn().mockResolvedValue(null),
+        findByEmail: jest.fn().mockResolvedValue(null),
+        findByRegister: jest.fn().mockResolvedValue(null),
+        save: jest.fn(),
+        update: jest.fn(),
+        updateById: jest.fn(),
+      }
+
+      jest.spyOn(UserController, 'repository', 'get').mockReturnValue(fakeUserRepository)
+
+      const response = await request(App).get(`/v1/users/${user.id}`)
+
+      expect(response.statusCode).toBe(400)
+      expect(response.body).toMatchObject({
+        ok: false,
+        error: {
+          message: i18n.__('errors.not-found'),
+          name: 'NotFoundError'
+        }
+      })
+    })
+
+    it('returns the user when is valid', async () => {
+      const user = userFactory()
+      const fakeUserRepository: any = {
+        findById: jest.fn().mockResolvedValue(user),
+        findByEmail: jest.fn().mockResolvedValue(user),
+        findByRegister: jest.fn().mockResolvedValue(user),
+        save: jest.fn(),
+        update: jest.fn(),
+        updateById: jest.fn(),
+      }
+
+      jest.spyOn(UserController, 'repository', 'get').mockReturnValue(fakeUserRepository)
+
+      const response = await request(App).get(`/v1/users/${user.id}`)
+
+      expect(response.statusCode).toBe(200)
+      expect(response.body).toMatchObject({
+        ok: true,
+        user: {
+          ...user,
+          birthDate: user.birthDate?.toISOString()
+        },
+      })
+    })
+  })
 })

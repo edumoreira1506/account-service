@@ -19,6 +19,7 @@ class UserController extends BaseController<User, UserRepository>  {
     this.auth = this.auth.bind(this)
     this.update = this.update.bind(this)
     this.remove = this.remove.bind(this)
+    this.show = this.show.bind(this)
   }
 
   @BaseController.errorHandler()
@@ -43,7 +44,7 @@ class UserController extends BaseController<User, UserRepository>  {
 
     const token = await AuthService.login(email, password, this.repository)
     
-    return res.send({ ok: true, message: i18n.__('messages.success-login'), token })
+    return BaseController.successResponse(res, { message: i18n.__('messages.success-login'), token })
   }
 
   @BaseController.errorHandler()
@@ -75,6 +76,15 @@ class UserController extends BaseController<User, UserRepository>  {
     if (!user) throw new NotFoundError()
 
     await this.repository.updateById(user.id, { active: false })
+  }
+
+  @BaseController.errorHandler()
+  async show(req: UserRequest, res: Response): Promise<Response> {
+    const user = req.user
+
+    if (!user) throw new NotFoundError()
+
+    return BaseController.successResponse(res, { user })
   }
 }
 
