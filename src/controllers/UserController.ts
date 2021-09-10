@@ -18,6 +18,7 @@ class UserController extends BaseController<User, UserRepository>  {
     this.store = this.store.bind(this)
     this.auth = this.auth.bind(this)
     this.update = this.update.bind(this)
+    this.remove = this.remove.bind(this)
   }
 
   @BaseController.errorHandler()
@@ -46,7 +47,7 @@ class UserController extends BaseController<User, UserRepository>  {
   }
 
   @BaseController.errorHandler()
-  @BaseController.updateHandler(i18n.__('messages.updated'))
+  @BaseController.actionHandler(i18n.__('messages.updated'))
   async update(req: UserRequest): Promise<void> {
     const user = req.user
 
@@ -64,6 +65,16 @@ class UserController extends BaseController<User, UserRepository>  {
       .build()
 
     await this.repository.update({ id: user.id }, userDTO)
+  }
+
+  @BaseController.errorHandler()
+  @BaseController.actionHandler(i18n.__('messages.removed'))
+  async remove(req: UserRequest): Promise<void> {
+    const user = req.user
+
+    if (!user) throw new NotFoundError()
+
+    await this.repository.updateById(user.id, { active: false })
   }
 }
 

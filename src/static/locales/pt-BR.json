@@ -7,6 +7,7 @@
 	"messages.success": "Cadastrado com sucesso!",
 	"messages.success-login": "Logado com sucesso!",
 	"messages.updated": "Atualizado com sucesso!",
+	"messages.removed": "Removido com sucesso!",
 	"app.title": "Account Service",
 	"app.description": "Documentação da API",
 	"user.fields.email": "E-mail",
