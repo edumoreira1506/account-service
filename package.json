@@ -20,7 +20,7 @@
 	"bugs": {},
 	"homepage": "",
 	"dependencies": {
-		"@cig-platform/core": "^0.2.20",
+		"@cig-platform/core": "^0.2.23",
 		"@cig-platform/docs": "^0.4.3",
 		"cors": "^2.8.5",
 		"crypto-js": "^4.1.1",
