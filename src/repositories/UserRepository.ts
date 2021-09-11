@@ -1,16 +1,10 @@
-import { EntityRepository, Repository } from 'typeorm'
-import { FindEntityErrorHandler } from '@cig-platform/core'
-import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity'
+import { EntityRepository } from 'typeorm'
+import { FindEntityErrorHandler, BaseRepository } from '@cig-platform/core'
 
 import User from '@Entities/UserEntity'
 
 @EntityRepository(User)
-export default class UserRepository extends Repository<User> {
-  @FindEntityErrorHandler()
-  findByField(fieldName: 'email' | 'register' | 'id', fieldValue: string) {
-    return this.findOne({ [fieldName]: fieldValue, active: true })
-  }
-
+export default class UserRepository extends BaseRepository<User> {
   @FindEntityErrorHandler()
   findByEmail(email: string) {
     return this.findByField('email', email)
@@ -19,14 +13,5 @@ export default class UserRepository extends Repository<User> {
   @FindEntityErrorHandler()
   findByRegister(register: string) {
     return this.findByField('register', register)
-  }
-
-  @FindEntityErrorHandler()
-  findById(id: string) {
-    return this.findByField('id', id)
-  }
-
-  updateById(id: string, fields: QueryDeepPartialEntity<User>) {
-    return this.update({ id }, fields)
   }
 }
