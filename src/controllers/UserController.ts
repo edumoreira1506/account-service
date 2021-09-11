@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
 import { ObjectType } from 'typeorm'
-import { BaseController } from '@cig-platform/core'
+import { BaseController, NotFoundError } from '@cig-platform/core'
 
 import { UserRequest } from '@Types/requests'
 import i18n from '@Configs/i18n'
@@ -8,7 +8,6 @@ import UserBuilder from '@Builders/UserBuilder'
 import User from '@Entities/UserEntity'
 import UserRepository from '@Repositories/UserRepository'
 import AuthService from '@Services/AuthService'
-import NotFoundError from '@Errors/NotFoundError'
 import EncryptService from '@Services/EncryptService'
 
 class UserController extends BaseController<User, UserRepository>  {
