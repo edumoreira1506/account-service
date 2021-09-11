@@ -1,4 +1,5 @@
-import NotFoundError from '@Errors/NotFoundError'
+import { NotFoundError, ApiError } from '@cig-platform/core'
+
 import { withUserParamFactory } from '@Middlewares/withUserParam'
 
 import userFactory from '../factories/userFactory'
@@ -51,7 +52,8 @@ describe('withUserParam', () => {
 
     await withUserParam(mockRequest, mockResponse, mockNext)
 
+
     expect(mockNext).not.toHaveBeenCalled()
-    expect(mockErrorCallback).toHaveBeenCalledWith(mockResponse, new NotFoundError().getError())
+    expect(mockErrorCallback).toHaveBeenCalledWith(mockResponse, (new NotFoundError() as ApiError).getError())
   })
 })

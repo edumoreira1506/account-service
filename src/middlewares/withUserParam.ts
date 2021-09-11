@@ -1,10 +1,9 @@
 import { NextFunction, Response } from 'express'
-import { ApiError, BaseController } from '@cig-platform/core'
+import { ApiError, BaseController, NotFoundError } from '@cig-platform/core'
 
 import { UserRequest } from '@Types/requests'
 import UserController from '@Controllers/UserController'
 import UserRepository from '@Repositories/UserRepository'
-import NotFoundError from '@Errors/NotFoundError'
 
 export const withUserParamFactory = (errorCallback: (res: Response, error: ApiError) => Response, repository?: UserRepository) => {
   return async (request: UserRequest, response: Response, next: NextFunction): Promise<void | Response<string, Record<string, string>>> => {
