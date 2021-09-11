@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
 import { ObjectType } from 'typeorm'
-import BaseController from '@cig-platform/core/build/controllers/BaseController'
+import { BaseController } from '@cig-platform/core'
 
 import { UserRequest } from '@Types/requests'
 import i18n from '@Configs/i18n'
