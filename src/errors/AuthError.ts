@@ -1,4 +1,4 @@
-import ApiError from '@cig-platform/core/build/errors/ApiError'
+import { ApiError } from '@cig-platform/core'
 
 import i18n from '@Configs/i18n'
 
