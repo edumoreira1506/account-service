@@ -1,6 +1,5 @@
 import faker from 'faker'
-
-import { User } from '@Types/user'
+import { IUser } from '@cig-platform/core'
 
 export default function userFactory({
   id,
@@ -9,14 +8,14 @@ export default function userFactory({
   name,
   birthDate,
   register
-}: User = {
+}: IUser = {
   id: faker.datatype.uuid(),
   email: faker.internet.email(),
   password: faker.internet.password(),
   name: faker.name.findName(),
   birthDate: faker.date.past(),
   register: `${faker.datatype.number({ min: 100, max: 999 })}.${faker.datatype.number({ min: 100, max: 999 })}.${faker.datatype.number({ min: 100, max: 999 })}-${faker.datatype.number({ min: 10, max: 99 })}`
-}): User {
+}): IUser {
   const confirmPassword = password
 
   return {
