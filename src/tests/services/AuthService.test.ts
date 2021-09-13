@@ -1,9 +1,9 @@
+import { userFactory } from '@cig-platform/core'
+
 import i18n from '@Configs/i18n'
 import AuthService from '@Services/AuthService'
 import EncryptService from '@Services/EncryptService'
 import TokenService from '@Services/TokenService'
-
-import userFactory from '../factories/userFactory'
 
 describe('AuthService', () => {
   describe('.login', () => {
