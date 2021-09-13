@@ -1,7 +1,7 @@
+import { userFactory } from '@cig-platform/core'
+
 import UserBuilder from '@Builders/UserBuilder'
 import i18n from '@Configs/i18n'
-
-import userFactory from '../factories/userFactory'
 
 describe('UserBuilder', () => {
   describe('.build', () => {

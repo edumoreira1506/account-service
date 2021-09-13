@@ -1,11 +1,11 @@
 import request from 'supertest'
 import typeorm from 'typeorm'
+import { userFactory } from '@cig-platform/core'
 
 import App from '@Configs/server'
 import i18n from '@Configs/i18n'
 import EncryptService from '@Services/EncryptService'
 
-import userFactory from '../factories/userFactory'
 import UserController from '@Controllers/UserController'
 
 jest.mock('typeorm', () => ({
