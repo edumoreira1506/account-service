@@ -1,4 +1,4 @@
-import { userFactory } from '@cig-platform/core'
+import { userFactory } from '@cig-platform/factories'
 
 import UserBuilder from '@Builders/UserBuilder'
 import i18n from '@Configs/i18n'
