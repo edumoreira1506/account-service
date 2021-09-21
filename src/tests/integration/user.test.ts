@@ -1,6 +1,6 @@
 import request from 'supertest'
 import typeorm from 'typeorm'
-import { userFactory } from '@cig-platform/core'
+import { userFactory } from '@cig-platform/factories'
 
 import App from '@Configs/server'
 import i18n from '@Configs/i18n'
