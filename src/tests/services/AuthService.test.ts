@@ -3,21 +3,20 @@ import { userFactory } from '@cig-platform/factories'
 import i18n from '@Configs/i18n'
 import AuthService from '@Services/AuthService'
 import EncryptService from '@Services/EncryptService'
-import TokenService from '@Services/TokenService'
 
 describe('AuthService', () => {
   describe('.login', () => {
-    it('returns a token', async () => {
-      const token = 'fake token'
-
-      jest.spyOn(TokenService, 'create').mockResolvedValue(token)
-
+    it('returns an user', async () => {
       const user = userFactory()
+      const mockEncryptPassword = jest.fn().mockReturnValue(user.password)
       const fakeUserRepository: any = {
-        findByEmail: jest.fn().mockResolvedValue({ ...user, password: EncryptService.encrypt(user.password) })
+        findByEmail: jest.fn().mockResolvedValue({ ...user })
       }
 
-      expect(await AuthService.login(user.email, user.password, fakeUserRepository)).toBe(token)
+      jest.spyOn(EncryptService, 'encrypt').mockImplementation(mockEncryptPassword)
+      jest.spyOn(EncryptService, 'decrypt').mockImplementation(mockEncryptPassword)
+
+      expect(await AuthService.login(user.email, user.password, fakeUserRepository)).toMatchObject(user)
     })
 
     it('trigger an error when email does not exist', async () => {

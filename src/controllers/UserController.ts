@@ -41,9 +41,9 @@ class UserController extends BaseController<User, UserRepository>  {
     const email = req.body.email
     const password = req.body.password
 
-    const token = await AuthService.login(email, password, this.repository)
+    const user = await AuthService.login(email, password, this.repository)
     
-    return BaseController.successResponse(res, { message: i18n.__('messages.success-login'), token })
+    return BaseController.successResponse(res, { message: i18n.__('messages.success-login'), user })
   }
 
   @BaseController.errorHandler()
