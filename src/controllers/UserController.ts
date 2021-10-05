@@ -85,6 +85,15 @@ class UserController extends BaseController<User, UserRepository>  {
 
     return BaseController.successResponse(res, { user })
   }
+
+  @BaseController.errorHandler()
+  async index(req: Request, res: Response): Promise<Response> {
+    const email = String(req.query?.email)
+
+    const users = await this.repository.search({ email })
+
+    return BaseController.successResponse(res, { users })
+  }
 }
 
 export default new UserController(UserRepository)
