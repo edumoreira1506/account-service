@@ -15,6 +15,14 @@ const userDocs = {
       title: 'Create user',
       objectSchema: storeUserSchema
     },
+    {
+      method: 'get',
+      title: 'Get users',
+      queryParams: [{
+        name: 'email',
+        type: 'string',
+      }]
+    }
   ]),
   ...createDoc('/users/{userId}', ['Users'], [
     {

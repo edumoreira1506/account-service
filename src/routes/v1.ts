@@ -10,6 +10,7 @@ const router = express.Router()
 router.post('/auth', withBodyValidation(authUserSchema), UserController.auth)
 
 router.post('/users', withBodyValidation(storeUserSchema), UserController.store)
+router.get('/users', UserController.index)
 router.patch('/users/:userId', withUserParam, withBodyValidation(updateUserSchema), UserController.update)
 router.delete('/users/:userId', withUserParam, UserController.remove)
 router.get('/users/:userId', withUserParam, UserController.show)
