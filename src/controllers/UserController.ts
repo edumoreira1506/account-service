@@ -19,6 +19,7 @@ class UserController extends BaseController<User, UserRepository>  {
     this.update = this.update.bind(this)
     this.remove = this.remove.bind(this)
     this.show = this.show.bind(this)
+    this.index = this.index.bind(this)
   }
 
   @BaseController.errorHandler()
@@ -88,7 +89,7 @@ class UserController extends BaseController<User, UserRepository>  {
 
   @BaseController.errorHandler()
   async index(req: Request, res: Response): Promise<Response> {
-    const email = String(req.query?.email)
+    const email = String(req.query?.email ?? '')
 
     const users = await this.repository.search({ email })
 
