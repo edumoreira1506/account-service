@@ -22,6 +22,7 @@
 	"dependencies": {
 		"@cig-platform/core": "^0.4.18",
 		"@cig-platform/docs": "^0.4.6",
+		"@cig-platform/encrypt": "0.0.1",
 		"@cig-platform/factories": "0.0.1",
 		"cors": "^2.8.5",
 		"crypto-js": "^4.1.1",
