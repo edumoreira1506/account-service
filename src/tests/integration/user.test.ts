@@ -1,5 +1,6 @@
 import request from 'supertest'
 import typeorm from 'typeorm'
+import faker from 'faker'
 import { userFactory } from '@cig-platform/factories'
 
 import App from '@Configs/server'
@@ -550,6 +551,42 @@ describe('User actions', () => {
           birthDate: user.birthDate?.toISOString()
         },
       })
+    })
+  })
+
+  describe('Search', () => {
+    it('returns the users', async () => {
+      const users = Array(10).fill(null).map(() => userFactory())
+      const fakeUserRepository: any = {
+        search: jest.fn().mockResolvedValue(users)
+      }
+
+      jest.spyOn(UserController, 'repository', 'get').mockReturnValue(fakeUserRepository)
+
+      const response = await request(App).get('/v1/users')
+
+      expect(response.statusCode).toBe(200)
+      expect(response.body).toMatchObject({
+        ok: true,
+        users: users.map((user) => ({
+          ...user,
+          birthDate: user.birthDate.toISOString()
+        }))
+      })
+    })
+
+    it('searches using the email sent as query param', async () => {
+      const users = Array(10).fill(null).map(() => userFactory())
+      const email = faker.internet.email()
+      const fakeUserRepository: any = {
+        search: jest.fn().mockResolvedValue(users)
+      }
+
+      jest.spyOn(UserController, 'repository', 'get').mockReturnValue(fakeUserRepository)
+
+      await request(App).get(`/v1/users?email=${email}`)
+
+      expect(fakeUserRepository.search).toHaveBeenCalledWith({ email })
     })
   })
 })
