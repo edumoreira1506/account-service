@@ -83,6 +83,10 @@ export default class UserBuilder {
     user.birthDate = this._birthDate
     user.register = this._register
 
+    if (this._id) {
+      user.id = this._id
+    }
+
     return user
   }
 }
