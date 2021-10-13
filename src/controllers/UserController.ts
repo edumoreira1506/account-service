@@ -63,6 +63,7 @@ class UserController extends BaseController<User, UserRepository>  {
       .setBirthDate(newUser.birthDate)
       .setRegister(newUser.register)
       .setId(user.id)
+      .setActive(user.active)
       .build()
 
     await this.repository.update({ id: user.id }, userDTO)

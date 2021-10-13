@@ -13,9 +13,16 @@ export default class UserBuilder {
   private _id: undefined | string = undefined;
   private _birthDate: Date;
   private _repository: UserRepository;
+  private _active = true;
 
   constructor(userRepository: UserRepository) {
     this._repository = userRepository
+  }
+
+  setActive(active: boolean): UserBuilder {
+    this._active = active
+
+    return this
   }
 
   setId(id: string): UserBuilder {
@@ -82,6 +89,7 @@ export default class UserBuilder {
     user.password = this._password
     user.birthDate = this._birthDate
     user.register = this._register
+    user.active = this._active
 
     if (this._id) {
       user.id = this._id
