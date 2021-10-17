@@ -30,7 +30,7 @@ describe('UserBuilder', () => {
         findByEmail: jest.fn().mockResolvedValue(user),
         findByRegister: jest.fn().mockResolvedValue(null)
       }
-      const userBuilder = new UserBuilder(fakeRepository)
+      const userBuilder = new UserBuilder(fakeRepository).setEmail(user.email)
 
       await expect(userBuilder.build).rejects.toThrow(i18n.__('user.errors.duplicated-email'))
     })
@@ -41,7 +41,7 @@ describe('UserBuilder', () => {
         findByEmail: jest.fn().mockResolvedValue(null),
         findByRegister: jest.fn().mockResolvedValue(user)
       }
-      const userBuilder = new UserBuilder(fakeRepository)
+      const userBuilder = new UserBuilder(fakeRepository).setRegister(user.register)
 
       await expect(userBuilder.build).rejects.toThrow(i18n.__('user.errors.duplicated-register'))
     })
