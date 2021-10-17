@@ -61,7 +61,7 @@ export default class UserBuilder {
     return this
   }
 
-  async validate(): Promise<void> {
+  validate = async(): Promise<void> => {
     const userOfEmail = await this._repository.findByEmail(this._email)
     const isDuplicatedEmail = Boolean(userOfEmail) && userOfEmail?.id !== this._id
 
@@ -73,7 +73,7 @@ export default class UserBuilder {
     if (isDuplicatedRegister) throw new ValidationError(i18n.__('user.errors.duplicated-register'))
   }
 
-  encryptPassword(): void {
+  encryptPassword = (): void => {
     this._password = EncryptService.encrypt(this._password)
   }
 
