@@ -1,5 +1,5 @@
 
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm'
+import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn } from 'typeorm'
 
 @Entity('users')
 export default class User {
@@ -23,4 +23,7 @@ export default class User {
 
   @Column({ type: 'bool' })
   active: boolean;
+
+  @CreateDateColumn({ name: 'created_at' })
+  createdAt: Date;
 }
