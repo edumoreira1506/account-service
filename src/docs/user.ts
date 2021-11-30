@@ -40,6 +40,14 @@ const userDocs = {
     }
   ], {
     pathVariables: [{ type: 'string', name: 'userId' }]
+  }),
+  ...createDoc('/users/{userId}/rollback', ['Users'], [
+    {
+      method: 'post',
+      title: 'Rollback user register',
+    },
+  ], {
+    pathVariables: [{ type: 'string', name: 'userId' }]
   })
 }
 

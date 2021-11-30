@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
 import { ObjectType } from 'typeorm'
-import { BaseController, NotFoundError } from '@cig-platform/core'
+import { ApiError, BaseController, NotFoundError } from '@cig-platform/core'
 
 import { UserRequest } from '@Types/requests'
 import i18n from '@Configs/i18n'
@@ -20,6 +20,7 @@ class UserController extends BaseController<User, UserRepository>  {
     this.remove = this.remove.bind(this)
     this.show = this.show.bind(this)
     this.index = this.index.bind(this)
+    this.rollback = this.rollback.bind(this)
   }
 
   @BaseController.errorHandler()
@@ -35,6 +36,23 @@ class UserController extends BaseController<User, UserRepository>  {
     const user = await this.repository.save(userDTO)
 
     return res.send({ ok: true, message: i18n.__('messages.success'), user })
+  }
+
+  @BaseController.errorHandler()
+  @BaseController.actionHandler(i18n.__('messages.removed'))
+  async rollback(req: UserRequest): Promise<void> {
+    const user = req.user
+
+    if (!user) throw new NotFoundError()
+
+    const now = new Date()
+    const userCreatedAt = user.createdAt
+    const diffInMilliSeconds = Math.abs(now.getTime() - userCreatedAt.getTime())
+    const diffInSeconds = diffInMilliSeconds / 1000
+
+    if (diffInSeconds > 60) throw new ApiError(i18n.__('rollback.errors.expired'))
+
+    await this.repository.delete({ id: user.id })
   }
 
   @BaseController.errorHandler()
