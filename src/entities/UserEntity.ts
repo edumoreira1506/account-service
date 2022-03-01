@@ -18,6 +18,9 @@ export default class User {
   @Column('varchar')
   register: string;
 
+  @Column({ type: 'varchar', name: 'register_type' })
+  registerType: string;
+
   @Column({ type: 'date', name: 'birth_date' })
   birthDate: Date;
 

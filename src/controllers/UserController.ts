@@ -31,6 +31,7 @@ class UserController extends BaseController<User, UserRepository>  {
       .setEmail(req.body.email)
       .setBirthDate(req.body.birthDate)
       .setRegister(req.body.register)
+      .setRegisterType(req.body.registerType)
       .build()
 
     const user = await this.repository.save(userDTO)

@@ -1,9 +1,15 @@
 import Joi from 'joi'
+import { UserRegisterTypeEnum } from '@cig-platform/enums'
 
 import i18n from '@Configs/i18n'
 import { MAXIMUM_CHARACTERS_NAME, MAXIMUM_CHARACTERS_PASSWORD, MINIMUM_CHARACTERS_NAME, MINIMUM_CHARACTERS_PASSWORD, REGISTER_REGEX } from '@Constants/user'
 
 export const storeUserSchema = Joi.object({
+  type: Joi.string().valid(...Object.values(UserRegisterTypeEnum)).messages({
+    'string.empty': i18n.__('empty-field', { field: i18n.__('user.fields.register-type') }),
+    'any.required': i18n.__('required-field', { field: i18n.__('user.fields.register-type') }),
+    'any.only': i18n.__('user.errors.invalid-register-type')
+  }),
   email: Joi.string().email().required().messages({
     'string.email': i18n.__('invalid-email', { field: i18n.__('user.fields.email') }),
     'string.empty': i18n.__('empty-field', { field: i18n.__('user.fields.email') }),

@@ -1,4 +1,5 @@
 import { ValidationError } from '@cig-platform/core'
+import { UserRegisterTypeEnum } from '@cig-platform/enums'
 
 import i18n from '@Configs/i18n'
 import User from '@Entities/UserEntity'
@@ -14,9 +15,16 @@ export default class UserBuilder {
   private _birthDate: Date;
   private _repository: UserRepository;
   private _active = true;
+  private _registerType = ''
 
   constructor(userRepository: UserRepository) {
     this._repository = userRepository
+  }
+
+  setRegisterType(registerType = UserRegisterTypeEnum.Default): UserBuilder {
+    this._registerType = registerType
+
+    return this
   }
 
   setActive(active: boolean): UserBuilder {
@@ -94,6 +102,7 @@ export default class UserBuilder {
     user.birthDate = this._birthDate
     user.register = this._register
     user.active = this._active
+    user.registerType = this._registerType
 
     if (this._id) {
       user.id = this._id
