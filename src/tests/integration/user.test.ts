@@ -93,7 +93,7 @@ describe('User actions', () => {
         ok: false,
         error: {
           name: 'ValidationError',
-          message: `${i18n.__('required-field', { field: i18n.__('user.fields.password') })}. ${i18n.__('required-field', { field: i18n.__('user.fields.confirm-password') })}`
+          message: i18n.__('user.errors.invalid-password')
         }
       })
     })
@@ -253,7 +253,9 @@ describe('User actions', () => {
   describe('Update', () => {
     it('is a valid user update', async () => {
       const mockUpdate = jest.fn()
-      const user = userFactory()
+      const user = userFactory({
+        password: EncryptService.encrypt('password')
+      })
       const newUserInfo = userFactory()
       const fakeUserRepository: any = {
         findById: jest.fn().mockResolvedValue(user),

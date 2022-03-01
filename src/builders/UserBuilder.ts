@@ -21,7 +21,7 @@ export default class UserBuilder {
     this._repository = userRepository
   }
 
-  setRegisterType(registerType = UserRegisterTypeEnum.Default): UserBuilder {
+  setRegisterType(registerType = UserRegisterTypeEnum.Default as string): UserBuilder {
     this._registerType = registerType
 
     return this
