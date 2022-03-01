@@ -1,4 +1,5 @@
 import { ValidationError } from '@cig-platform/core'
+import { UserRegisterTypeEnum } from '@cig-platform/enums'
 
 import i18n from '@Configs/i18n'
 import User from '@Entities/UserEntity'
@@ -14,9 +15,16 @@ export default class UserBuilder {
   private _birthDate: Date;
   private _repository: UserRepository;
   private _active = true;
+  private _registerType = ''
 
   constructor(userRepository: UserRepository) {
     this._repository = userRepository
+  }
+
+  setRegisterType(registerType = UserRegisterTypeEnum.Default as string): UserBuilder {
+    this._registerType = registerType
+
+    return this
   }
 
   setActive(active: boolean): UserBuilder {
@@ -61,7 +69,15 @@ export default class UserBuilder {
     return this
   }
 
+  get isDefaultRegisterType() {
+    return this._registerType === UserRegisterTypeEnum.Default
+  }
+
   validate = async(): Promise<void> => {
+    if (this.isDefaultRegisterType && !this._password) {
+      throw new ValidationError(i18n.__('user.errors.invalid-password'))
+    }
+
     if (this._email) {
       const userOfEmail = await this._repository.findByEmail(this._email)
       const isDuplicatedEmail = Boolean(userOfEmail) && userOfEmail?.id !== this._id
@@ -84,16 +100,23 @@ export default class UserBuilder {
   build = async (): Promise<User> => {
     await this.validate()
 
-    this.encryptPassword()
+    if (this.isDefaultRegisterType) {
+      this.encryptPassword()
+    }
 
     const user = new User()
 
     user.name = this._name
     user.email = this._email
-    user.password = this._password
+
+    if (this.isDefaultRegisterType) {
+      user.password = this._password
+    }
+
     user.birthDate = this._birthDate
     user.register = this._register
     user.active = this._active
+    user.registerType = this._registerType
 
     if (this._id) {
       user.id = this._id

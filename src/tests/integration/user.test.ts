@@ -8,6 +8,7 @@ import i18n from '@Configs/i18n'
 import EncryptService from '@Services/EncryptService'
 
 import UserController from '@Controllers/UserController'
+import { UserRegisterTypeEnum } from '@cig-platform/enums'
 
 jest.mock('typeorm', () => ({
   createConnection: jest.fn().mockResolvedValue({}),
@@ -59,6 +60,38 @@ describe('User actions', () => {
       }))
     })
 
+    it('is a valid user when is a facebook', async () => {
+      const mockSave = jest.fn()
+      const user = userFactory()
+
+      jest.spyOn(typeorm, 'getCustomRepository').mockReturnValue({
+        save: mockSave,
+        findByEmail: jest.fn().mockResolvedValue(null),
+        findById: jest.fn().mockResolvedValue(null),
+        findByRegister: jest.fn().mockResolvedValue(null),
+      })
+
+      const response = await request(App).post('/v1/users').send({
+        name: user.name,
+        email: user.email,
+        register: user.register,
+        birthDate: user.birthDate,
+        registerType: UserRegisterTypeEnum.Facebook
+      })
+
+      expect(response.statusCode).toBe(200)
+      expect(response.body).toMatchObject({
+        message: i18n.__('messages.success'),
+        ok: true,
+      })
+      expect(mockSave).toHaveBeenCalledWith(expect.objectContaining({
+        name: user.name,
+        email: user.email,
+        register: user.register,
+        registerType: UserRegisterTypeEnum.Facebook
+      }))
+    })
+
     it('is a invalid user when has no email', async () => {
       const user = userFactory()
       const response = await request(App).post('/v1/users').send({
@@ -93,7 +126,7 @@ describe('User actions', () => {
         ok: false,
         error: {
           name: 'ValidationError',
-          message: `${i18n.__('required-field', { field: i18n.__('user.fields.password') })}. ${i18n.__('required-field', { field: i18n.__('user.fields.confirm-password') })}`
+          message: i18n.__('user.errors.invalid-password')
         }
       })
     })
@@ -253,7 +286,9 @@ describe('User actions', () => {
   describe('Update', () => {
     it('is a valid user update', async () => {
       const mockUpdate = jest.fn()
-      const user = userFactory()
+      const user = userFactory({
+        password: EncryptService.encrypt('password')
+      })
       const newUserInfo = userFactory()
       const fakeUserRepository: any = {
         findById: jest.fn().mockResolvedValue(user),
