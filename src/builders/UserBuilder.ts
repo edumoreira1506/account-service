@@ -69,7 +69,15 @@ export default class UserBuilder {
     return this
   }
 
+  get isDefaultRegisterType() {
+    return this._registerType === UserRegisterTypeEnum.Default
+  }
+
   validate = async(): Promise<void> => {
+    if (this.isDefaultRegisterType && !this._password) {
+      throw new ValidationError(i18n.__('user.errors.invalid-password'))
+    }
+
     if (this._email) {
       const userOfEmail = await this._repository.findByEmail(this._email)
       const isDuplicatedEmail = Boolean(userOfEmail) && userOfEmail?.id !== this._id
@@ -92,13 +100,19 @@ export default class UserBuilder {
   build = async (): Promise<User> => {
     await this.validate()
 
-    this.encryptPassword()
+    if (this.isDefaultRegisterType) {
+      this.encryptPassword()
+    }
 
     const user = new User()
 
     user.name = this._name
     user.email = this._email
-    user.password = this._password
+
+    if (this.isDefaultRegisterType) {
+      user.password = this._password
+    }
+
     user.birthDate = this._birthDate
     user.register = this._register
     user.active = this._active
