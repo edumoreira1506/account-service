@@ -8,6 +8,7 @@ import i18n from '@Configs/i18n'
 import EncryptService from '@Services/EncryptService'
 
 import UserController from '@Controllers/UserController'
+import { UserRegisterTypeEnum } from '@cig-platform/enums'
 
 jest.mock('typeorm', () => ({
   createConnection: jest.fn().mockResolvedValue({}),
@@ -56,6 +57,38 @@ describe('User actions', () => {
         name: user.name,
         email: user.email,
         register: user.register,
+      }))
+    })
+
+    it('is a valid user when is a facebook', async () => {
+      const mockSave = jest.fn()
+      const user = userFactory()
+
+      jest.spyOn(typeorm, 'getCustomRepository').mockReturnValue({
+        save: mockSave,
+        findByEmail: jest.fn().mockResolvedValue(null),
+        findById: jest.fn().mockResolvedValue(null),
+        findByRegister: jest.fn().mockResolvedValue(null),
+      })
+
+      const response = await request(App).post('/v1/users').send({
+        name: user.name,
+        email: user.email,
+        register: user.register,
+        birthDate: user.birthDate,
+        registerType: UserRegisterTypeEnum.Facebook
+      })
+
+      expect(response.statusCode).toBe(200)
+      expect(response.body).toMatchObject({
+        message: i18n.__('messages.success'),
+        ok: true,
+      })
+      expect(mockSave).toHaveBeenCalledWith(expect.objectContaining({
+        name: user.name,
+        email: user.email,
+        register: user.register,
+        registerType: UserRegisterTypeEnum.Facebook
       }))
     })
 
