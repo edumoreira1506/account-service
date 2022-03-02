@@ -85,6 +85,10 @@ export default class UserBuilder {
       throw new ValidationError(i18n.__('user.errors.invalid-password'))
     }
 
+    if (!this.isDefaultRegisterType && !this._externalId) {
+      throw new ValidationError(i18n.__('user.errors.invalid-external-id'))
+    }
+
     if (this._email) {
       const userOfEmail = await this._repository.findByEmail(this._email)
       const isDuplicatedEmail = Boolean(userOfEmail) && userOfEmail?.id !== this._id
