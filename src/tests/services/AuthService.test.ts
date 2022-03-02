@@ -1,3 +1,4 @@
+import { UserRegisterTypeEnum } from '@cig-platform/enums'
 import { userFactory } from '@cig-platform/factories'
 
 import i18n from '@Configs/i18n'
@@ -16,7 +17,23 @@ describe('AuthService', () => {
       jest.spyOn(EncryptService, 'encrypt').mockImplementation(mockEncryptPassword)
       jest.spyOn(EncryptService, 'decrypt').mockImplementation(mockEncryptPassword)
 
-      expect(await AuthService.login(user.email, user.password, fakeUserRepository)).toMatchObject(user)
+      expect(await AuthService.login({
+        email: user.email,
+        password: user.password
+      }, fakeUserRepository)).toMatchObject(user)
+    })
+
+    it('trigger an error when is a facebook login and is not a valid external id', async () => {
+      const user = userFactory()
+      const fakeUserRepository: any = {
+        findByEmail: jest.fn().mockResolvedValue({ ...user })
+      }
+
+      await expect(AuthService.login({
+        email: user.email,
+        externalId: 'another external id',
+        type: UserRegisterTypeEnum.Facebook
+      }, fakeUserRepository)).rejects.toThrow(i18n.__('auth.errors.invalid-login'))
     })
 
     it('trigger an error when email does not exist', async () => {
@@ -25,7 +42,10 @@ describe('AuthService', () => {
         findByEmail: jest.fn().mockResolvedValue(null)
       }
 
-      await expect(AuthService.login(user.email, user.password, fakeUserRepository)).rejects.toThrow(i18n.__('auth.errors.invalid-login'))
+      await expect(AuthService.login({
+        email: user.email,
+        password: user.password
+      }, fakeUserRepository)).rejects.toThrow(i18n.__('auth.errors.invalid-login'))
     })
 
     it('trigger an error when password does not match', async () => {
@@ -34,7 +54,10 @@ describe('AuthService', () => {
         findByEmail: jest.fn().mockResolvedValue({ ...user, password: EncryptService.encrypt(user.password) })
       }
 
-      await expect(AuthService.login(user.email, 'wrong password', fakeUserRepository)).rejects.toThrow(i18n.__('auth.errors.invalid-login'))
+      await expect(AuthService.login({
+        email: user.email,
+        password: 'wrong password'
+      }, fakeUserRepository)).rejects.toThrow(i18n.__('auth.errors.invalid-login'))
     })
   })
 })

@@ -32,6 +32,7 @@ class UserController extends BaseController<User, UserRepository>  {
       .setBirthDate(req.body.birthDate)
       .setRegister(req.body.register)
       .setRegisterType(req.body.registerType)
+      .setExternalId(req.body.externalId)
       .build()
 
     const user = await this.repository.save(userDTO)
@@ -60,8 +61,15 @@ class UserController extends BaseController<User, UserRepository>  {
   async auth(req: Request, res: Response): Promise<Response> {
     const email = req.body.email
     const password = req.body.password
+    const type = req.body.type
+    const externalId = req.body.externalId
 
-    const user = await AuthService.login(email, password, this.repository)
+    const user = await AuthService.login({
+      email,
+      password,
+      type,
+      externalId
+    }, this.repository)
     
     return BaseController.successResponse(res, { message: i18n.__('messages.success-login'), user })
   }

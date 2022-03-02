@@ -18,6 +18,9 @@ export default class User {
   @Column('varchar')
   register: string;
 
+  @Column({ type: 'uuid', name: 'external_id' })
+  externalId: string;
+
   @Column({ type: 'varchar', name: 'register_type' })
   registerType: string;
 
