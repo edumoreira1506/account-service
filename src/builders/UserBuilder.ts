@@ -15,7 +15,7 @@ export default class UserBuilder {
   private _birthDate: Date;
   private _repository: UserRepository;
   private _active = true;
-  private _registerType = ''
+  private _registerType: string = UserRegisterTypeEnum.Default
   private _externalId = '';
 
   constructor(userRepository: UserRepository) {

@@ -13,7 +13,7 @@ export default class AuthService {
   }: {
     email: string;
     password: string;
-    type: string;
+    type?: string;
     externalId?: string;
   }, userRepository: UserRepository) {
     const user = await userRepository.findByEmail(email)

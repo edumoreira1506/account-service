@@ -16,7 +16,10 @@ describe('AuthService', () => {
       jest.spyOn(EncryptService, 'encrypt').mockImplementation(mockEncryptPassword)
       jest.spyOn(EncryptService, 'decrypt').mockImplementation(mockEncryptPassword)
 
-      expect(await AuthService.login(user.email, user.password, fakeUserRepository)).toMatchObject(user)
+      expect(await AuthService.login({
+        email: user.email,
+        password: user.password
+      }, fakeUserRepository)).toMatchObject(user)
     })
 
     it('trigger an error when email does not exist', async () => {
@@ -25,7 +28,10 @@ describe('AuthService', () => {
         findByEmail: jest.fn().mockResolvedValue(null)
       }
 
-      await expect(AuthService.login(user.email, user.password, fakeUserRepository)).rejects.toThrow(i18n.__('auth.errors.invalid-login'))
+      await expect(AuthService.login({
+        email: user.email,
+        password: user.password
+      }, fakeUserRepository)).rejects.toThrow(i18n.__('auth.errors.invalid-login'))
     })
 
     it('trigger an error when password does not match', async () => {
@@ -34,7 +40,10 @@ describe('AuthService', () => {
         findByEmail: jest.fn().mockResolvedValue({ ...user, password: EncryptService.encrypt(user.password) })
       }
 
-      await expect(AuthService.login(user.email, 'wrong password', fakeUserRepository)).rejects.toThrow(i18n.__('auth.errors.invalid-login'))
+      await expect(AuthService.login({
+        email: user.email,
+        password: 'wrong password'
+      }, fakeUserRepository)).rejects.toThrow(i18n.__('auth.errors.invalid-login'))
     })
   })
 })

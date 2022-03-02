@@ -76,7 +76,8 @@ describe('User actions', () => {
         email: user.email,
         register: user.register,
         birthDate: user.birthDate,
-        registerType: UserRegisterTypeEnum.Facebook
+        registerType: UserRegisterTypeEnum.Facebook,
+        externalId: user.externalId
       })
 
       expect(response.statusCode).toBe(200)
@@ -88,7 +89,8 @@ describe('User actions', () => {
         name: user.name,
         email: user.email,
         register: user.register,
-        registerType: UserRegisterTypeEnum.Facebook
+        registerType: UserRegisterTypeEnum.Facebook,
+        externalId: user.externalId
       }))
     })
 
