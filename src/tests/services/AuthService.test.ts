@@ -1,3 +1,4 @@
+import { UserRegisterTypeEnum } from '@cig-platform/enums'
 import { userFactory } from '@cig-platform/factories'
 
 import i18n from '@Configs/i18n'
@@ -20,6 +21,19 @@ describe('AuthService', () => {
         email: user.email,
         password: user.password
       }, fakeUserRepository)).toMatchObject(user)
+    })
+
+    it('trigger an error when is a facebook login and is not a valid external id', async () => {
+      const user = userFactory()
+      const fakeUserRepository: any = {
+        findByEmail: jest.fn().mockResolvedValue({ ...user })
+      }
+
+      await expect(AuthService.login({
+        email: user.email,
+        externalId: 'another external id',
+        type: UserRegisterTypeEnum.Facebook
+      }, fakeUserRepository)).rejects.toThrow(i18n.__('auth.errors.invalid-login'))
     })
 
     it('trigger an error when email does not exist', async () => {

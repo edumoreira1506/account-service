@@ -7,12 +7,12 @@ import EncryptService from '@Services/EncryptService'
 export default class AuthService {
   static async login({
     email,
-    password,
+    password = '',
     externalId,
     type = UserRegisterTypeEnum.Default
   }: {
     email: string;
-    password: string;
+    password?: string;
     type?: string;
     externalId?: string;
   }, userRepository: UserRepository) {

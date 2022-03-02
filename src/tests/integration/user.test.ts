@@ -240,6 +240,29 @@ describe('User actions', () => {
       })
     })
 
+    it('is valid user credentials when is facebook login', async () => {
+      const user = userFactory()
+
+      jest.spyOn(typeorm, 'getCustomRepository').mockReturnValue({
+        findByEmail: jest.fn().mockResolvedValue({
+          ...user,
+          externalId: user.externalId
+        }),
+      })
+
+      const response = await request(App).post('/v1/auth').send({
+        email: user.email,
+        type: UserRegisterTypeEnum.Facebook,
+        externalId: user.externalId
+      })
+
+      expect(response.statusCode).toBe(200)
+      expect(response.body).toMatchObject({
+        ok: true,
+        message: i18n.__('messages.success-login'),
+      })
+    })
+
     it('is invalid user credentials when email does not exist', async () => {
       const user = userFactory()
 
