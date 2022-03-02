@@ -10,6 +10,7 @@ export const storeUserSchema = Joi.object({
     'any.required': i18n.__('required-field', { field: i18n.__('user.fields.register-type') }),
     'any.only': i18n.__('user.errors.invalid-register-type')
   }),
+  externalId: Joi.string(),
   email: Joi.string().email().required().messages({
     'string.email': i18n.__('invalid-email', { field: i18n.__('user.fields.email') }),
     'string.empty': i18n.__('empty-field', { field: i18n.__('user.fields.email') }),

@@ -16,9 +16,16 @@ export default class UserBuilder {
   private _repository: UserRepository;
   private _active = true;
   private _registerType = ''
+  private _externalId = '';
 
   constructor(userRepository: UserRepository) {
     this._repository = userRepository
+  }
+
+  setExternalId(externalId: string): UserBuilder {
+    this._externalId = externalId
+
+    return this
   }
 
   setRegisterType(registerType = UserRegisterTypeEnum.Default as string): UserBuilder {
@@ -117,6 +124,10 @@ export default class UserBuilder {
     user.register = this._register
     user.active = this._active
     user.registerType = this._registerType
+
+    if (this._externalId) {
+      user.externalId = this._externalId
+    }
 
     if (this._id) {
       user.id = this._id
