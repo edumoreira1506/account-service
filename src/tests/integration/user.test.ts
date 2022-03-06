@@ -226,6 +226,80 @@ describe('User actions', () => {
     })
   })
 
+  describe('Rollback', () => {
+    it('returns OK when user exists and the rollback time is not expired yet', async () => {
+      const user = { ...userFactory(), createdAt: new Date() }
+      const fakeUserRepository: any = {
+        findById: jest.fn().mockResolvedValue(user),
+        delete: jest.fn(),
+      }
+
+      jest.spyOn(UserController, 'repository', 'get').mockReturnValue(fakeUserRepository)
+
+      const response = await request(App).post(`/v1/users/${user.id}/rollback`)
+
+      expect(response.statusCode).toBe(200)
+      expect(response.body).toMatchObject({
+        ok: true,
+        message: i18n.__('messages.removed')
+      })
+      expect(fakeUserRepository.delete).toHaveBeenCalledWith({ id: user.id })
+      expect(fakeUserRepository.findById).toHaveBeenCalledWith(user.id)
+    })
+
+    it('returns not found error when user does not exist', async () => {
+      const user = null
+      const userId = faker.datatype.uuid()
+      const fakeUserRepository: any = {
+        findById: jest.fn().mockResolvedValue(user),
+        delete: jest.fn(),
+      }
+
+      jest.spyOn(UserController, 'repository', 'get').mockReturnValue(fakeUserRepository)
+
+      const response = await request(App).post(`/v1/users/${userId}/rollback`)
+
+      expect(response.statusCode).toBe(400)
+      expect(response.body).toMatchObject({
+        ok: false,
+        error: {
+          name: 'NotFoundError',
+          message: i18n.__('errors.not-found')
+        }
+      })
+      expect(fakeUserRepository.findById).toHaveBeenCalledWith(userId)
+      expect(fakeUserRepository.delete).not.toHaveBeenCalled()
+    })
+
+    it('returns expired error when the time to rollback user is expired', async () => {
+      const second = 1000
+      const minute = 60 * second
+      const nowDate = new Date()
+      const oneHourAgoDate = new Date(nowDate.getTime() - (60 * minute))
+      const user = { ...userFactory(), createdAt: oneHourAgoDate }
+      const userId = faker.datatype.uuid()
+      const fakeUserRepository: any = {
+        findById: jest.fn().mockResolvedValue(user),
+        delete: jest.fn(),
+      }
+
+      jest.spyOn(UserController, 'repository', 'get').mockReturnValue(fakeUserRepository)
+
+      const response = await request(App).post(`/v1/users/${userId}/rollback`)
+
+      expect(response.statusCode).toBe(400)
+      expect(response.body).toMatchObject({
+        ok: false,
+        error: {
+          name: 'Error',
+          message: i18n.__('rollback.errors.expired')
+        }
+      })
+      expect(fakeUserRepository.findById).toHaveBeenCalledWith(userId)
+      expect(fakeUserRepository.delete).not.toHaveBeenCalled()
+    })
+  })
+
   describe('Authentication', () => {
     it('is valid user credentials', async () => {
       const user = userFactory()
