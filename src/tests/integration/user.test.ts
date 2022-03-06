@@ -28,6 +28,11 @@ jest.mock('typeorm', () => ({
 }))
 
 describe('User actions', () => {
+  afterEach(() => {
+    jest.resetAllMocks()
+    jest.clearAllMocks()
+  })
+
   describe('Register', () => {
     it('is a valid user', async () => {
       const mockSave = jest.fn()
@@ -304,9 +309,11 @@ describe('User actions', () => {
     it('is invalid user credentials when email does not exist', async () => {
       const user = userFactory()
 
-      jest.spyOn(typeorm, 'getCustomRepository').mockReturnValue({
+      const fakeUserRepository: any = {
         findByEmail: jest.fn().mockResolvedValue(null),
-      })
+      }
+
+      jest.spyOn(UserController, 'repository', 'get').mockReturnValue(fakeUserRepository)
 
       const response = await request(App).post('/v1/auth').send({
         email: user.email,
@@ -327,10 +334,12 @@ describe('User actions', () => {
       it('is valid user credentials', async () => {
         const user = userFactory()
   
-        jest.spyOn(typeorm, 'getCustomRepository').mockReturnValue({
+        const fakeUserRepository: any = {
           findByEmail: jest.fn().mockResolvedValue({ ...user, password: EncryptService.encrypt(user.password) }),
-        })
+        }
   
+        jest.spyOn(UserController, 'repository', 'get').mockReturnValue(fakeUserRepository)
+
         const response = await request(App).post('/v1/auth').send({
           email: user.email,
           password: user.password
@@ -346,10 +355,12 @@ describe('User actions', () => {
       it('is invalid user credentials when password does not match', async () => {
         const user = userFactory()
   
-        jest.spyOn(typeorm, 'getCustomRepository').mockReturnValue({
+        const fakeUserRepository: any = {
           findByEmail: jest.fn().mockResolvedValue({ ...user, password: EncryptService.encrypt(user.password) }),
-        })
+        }
   
+        jest.spyOn(UserController, 'repository', 'get').mockReturnValue(fakeUserRepository)
+
         const response = await request(App).post('/v1/auth').send({
           email: user.email,
           password: 'wrong password'
@@ -371,13 +382,15 @@ describe('User actions', () => {
         it('is valid user credentials ', async () => {
           const user = userFactory({ registerType })
     
-          jest.spyOn(typeorm, 'getCustomRepository').mockReturnValue({
+          const fakeUserRepository: any = {
             findByEmail: jest.fn().mockResolvedValue({
               ...user,
               externalId: user.externalId
             }),
-          })
+          }
     
+          jest.spyOn(UserController, 'repository', 'get').mockReturnValue(fakeUserRepository)
+
           const response = await request(App).post('/v1/auth').send({
             email: user.email,
             type: registerType,
@@ -395,13 +408,15 @@ describe('User actions', () => {
           const externalId = faker.datatype.uuid()
           const user = userFactory({ registerType })
     
-          jest.spyOn(typeorm, 'getCustomRepository').mockReturnValue({
+          const fakeUserRepository: any = {
             findByEmail: jest.fn().mockResolvedValue({
               ...user,
               externalId: user.externalId
             }),
-          })
+          }
     
+          jest.spyOn(UserController, 'repository', 'get').mockReturnValue(fakeUserRepository)
+
           const response = await request(App).post('/v1/auth').send({
             email: user.email,
             type: registerType,
@@ -466,7 +481,6 @@ describe('User actions', () => {
         update: mockUpdate,
       }
 
-      jest.spyOn(typeorm, 'getCustomRepository').mockReturnValue(fakeUserRepository)
       jest.spyOn(UserController, 'repository', 'get').mockReturnValue(fakeUserRepository)
       jest.spyOn(EncryptService, 'encrypt').mockReturnValue(password)
 
@@ -497,7 +511,6 @@ describe('User actions', () => {
         update: mockUpdate,
       }
 
-      jest.spyOn(typeorm, 'getCustomRepository').mockReturnValue(fakeUserRepository)
       jest.spyOn(UserController, 'repository', 'get').mockReturnValue(fakeUserRepository)
       jest.spyOn(EncryptService, 'encrypt').mockReturnValue(encryptedPassword)
 
