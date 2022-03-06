@@ -2,6 +2,9 @@ import { userFactory } from '@cig-platform/factories'
 
 import UserBuilder from '@Builders/UserBuilder'
 import i18n from '@Configs/i18n'
+import { UserRegisterTypeEnum } from '@cig-platform/enums'
+
+const EXTERNAL_REGISTER_TYPES = [UserRegisterTypeEnum.Facebook, UserRegisterTypeEnum.Gmail]
 
 describe('UserBuilder', () => {
   describe('.build', () => {
@@ -24,7 +27,42 @@ describe('UserBuilder', () => {
       })
     })
 
-    it('a invalid user when is a duplicated email', async () => {
+    it('an invalid user when is default register type and has no password', async () => {
+      const password = ''
+      const user = userFactory({ password, confirmPassword: password })
+      const fakeRepository: any = {
+        findByEmail: jest.fn().mockResolvedValue(null),
+        findByRegister: jest.fn().mockResolvedValue(null)
+      }
+      const userBuilder = new UserBuilder(fakeRepository)
+        .setName(user.name)
+        .setPassword(user.password)
+        .setEmail(user.email)
+        .setRegister(user.register)
+
+      await expect(userBuilder.build).rejects.toThrow(i18n.__('user.errors.invalid-password'))
+    })
+
+    EXTERNAL_REGISTER_TYPES.forEach(registerType => {
+      it(`an invalid user when is register type ${registerType} and has no external id`, async () => {
+        const externalId = ''
+        const user = userFactory({ externalId, registerType })
+        const fakeRepository: any = {
+          findByEmail: jest.fn().mockResolvedValue(null),
+          findByRegister: jest.fn().mockResolvedValue(null)
+        }
+        const userBuilder = new UserBuilder(fakeRepository)
+          .setName(user.name)
+          .setPassword(user.password)
+          .setEmail(user.email)
+          .setRegister(user.register)
+          .setRegisterType(user.registerType)
+  
+        await expect(userBuilder.build).rejects.toThrow(i18n.__('user.errors.invalid-external-id'))
+      })
+    })
+
+    it('an invalid user when is a duplicated email', async () => {
       const user = userFactory()
       const fakeRepository: any = {
         findByEmail: jest.fn().mockResolvedValue(user),
@@ -35,7 +73,7 @@ describe('UserBuilder', () => {
       await expect(userBuilder.build).rejects.toThrow(i18n.__('user.errors.duplicated-email'))
     })
 
-    it('a invalid user when is a duplicated register', async () => {
+    it('an invalid user when is a duplicated register', async () => {
       const user = userFactory()
       const fakeRepository: any = {
         findByEmail: jest.fn().mockResolvedValue(null),
