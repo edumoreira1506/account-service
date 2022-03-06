@@ -6,6 +6,8 @@ import User from '@Entities/UserEntity'
 import UserRepository from '@Repositories/UserRepository'
 import EncryptService from '@Services/EncryptService'
 
+export const EXTERNAL_REGISTER_TYPES = [UserRegisterTypeEnum.Facebook, UserRegisterTypeEnum.Gmail]
+
 export default class UserBuilder {
   private _name = ''
   private _email = ''

@@ -9,6 +9,7 @@ import EncryptService from '@Services/EncryptService'
 
 import UserController from '@Controllers/UserController'
 import { UserRegisterTypeEnum } from '@cig-platform/enums'
+import { EXTERNAL_REGISTER_TYPES } from '@Builders/UserBuilder'
 
 jest.mock('typeorm', () => ({
   createConnection: jest.fn().mockResolvedValue({}),
@@ -60,40 +61,6 @@ describe('User actions', () => {
       }))
     })
 
-    it('is a valid user when is a facebook', async () => {
-      const mockSave = jest.fn()
-      const user = userFactory()
-
-      jest.spyOn(typeorm, 'getCustomRepository').mockReturnValue({
-        save: mockSave,
-        findByEmail: jest.fn().mockResolvedValue(null),
-        findById: jest.fn().mockResolvedValue(null),
-        findByRegister: jest.fn().mockResolvedValue(null),
-      })
-
-      const response = await request(App).post('/v1/users').send({
-        name: user.name,
-        email: user.email,
-        register: user.register,
-        birthDate: user.birthDate,
-        registerType: UserRegisterTypeEnum.Facebook,
-        externalId: user.externalId
-      })
-
-      expect(response.statusCode).toBe(200)
-      expect(response.body).toMatchObject({
-        message: i18n.__('messages.success'),
-        ok: true,
-      })
-      expect(mockSave).toHaveBeenCalledWith(expect.objectContaining({
-        name: user.name,
-        email: user.email,
-        register: user.register,
-        registerType: UserRegisterTypeEnum.Facebook,
-        externalId: user.externalId
-      }))
-    })
-
     it('is a invalid user when has no email', async () => {
       const user = userFactory()
       const response = await request(App).post('/v1/users').send({
@@ -110,49 +77,6 @@ describe('User actions', () => {
         error: {
           name: 'ValidationError',
           message: i18n.__('required-field', { field: i18n.__('user.fields.email') })
-        }
-      })
-    })
-
-    it('is a invalid user when has no password', async () => {
-      const user = userFactory()
-      const response = await request(App).post('/v1/users').send({
-        name: user.name,
-        register: user.register,
-        birthDate: user.birthDate,
-        email: user.email,
-      })
-
-      expect(response.statusCode).toBe(400)
-      expect(response.body).toMatchObject({
-        ok: false,
-        error: {
-          name: 'ValidationError',
-          message: i18n.__('user.errors.invalid-password')
-        }
-      })
-    })
-
-    it('is a invalid user when password is different from the password', async () => {
-      const user = userFactory()
-      const response = await request(App).post('/v1/users').send({
-        name: user.name,
-        register: user.register,
-        password: 'one',
-        confirmPassword: 'another',
-        birthDate: user.birthDate,
-        email: user.email,
-      })
-
-      expect(response.statusCode).toBe(400)
-      expect(response.body).toMatchObject({
-        ok: false,
-        error: {
-          name: 'ValidationError',
-          message: i18n.__('must-be-equal', {
-            field1: i18n.__('user.fields.password'),
-            field2: i18n.__('user.fields.confirm-password').toLowerCase()
-          })
         }
       })
     })
@@ -216,6 +140,88 @@ describe('User actions', () => {
           name: 'ValidationError',
           message:  i18n.__('invalid-date', { field: i18n.__('user.fields.birth-date') })
         }
+      })
+    })
+
+    EXTERNAL_REGISTER_TYPES.forEach(registerType => {
+      it(`is a valid user when has no password and register type is ${registerType}`, async () => {
+        const mockSave = jest.fn()
+        const user = userFactory()
+  
+        jest.spyOn(typeorm, 'getCustomRepository').mockReturnValue({
+          save: mockSave,
+          findByEmail: jest.fn().mockResolvedValue(null),
+          findById: jest.fn().mockResolvedValue(null),
+          findByRegister: jest.fn().mockResolvedValue(null),
+        })
+  
+        const response = await request(App).post('/v1/users').send({
+          name: user.name,
+          email: user.email,
+          register: user.register,
+          birthDate: user.birthDate,
+          registerType: UserRegisterTypeEnum.Facebook,
+          externalId: user.externalId
+        })
+  
+        expect(response.statusCode).toBe(200)
+        expect(response.body).toMatchObject({
+          message: i18n.__('messages.success'),
+          ok: true,
+        })
+        expect(mockSave).toHaveBeenCalledWith(expect.objectContaining({
+          name: user.name,
+          email: user.email,
+          register: user.register,
+          registerType: UserRegisterTypeEnum.Facebook,
+          externalId: user.externalId
+        }))
+      })
+    })
+
+    describe('default register type', () => {
+      it('is a invalid user when has no password and', async () => {
+        const user = userFactory({ registerType: UserRegisterTypeEnum.Default })
+        const response = await request(App).post('/v1/users').send({
+          name: user.name,
+          register: user.register,
+          birthDate: user.birthDate,
+          email: user.email,
+          registerType: user.registerType
+        })
+  
+        expect(response.statusCode).toBe(400)
+        expect(response.body).toMatchObject({
+          ok: false,
+          error: {
+            name: 'ValidationError',
+            message: i18n.__('user.errors.invalid-password')
+          }
+        })
+      })
+  
+      it('is a invalid user when password is different from the password', async () => {
+        const user = userFactory()
+        const response = await request(App).post('/v1/users').send({
+          name: user.name,
+          register: user.register,
+          password: 'one',
+          confirmPassword: 'another',
+          birthDate: user.birthDate,
+          email: user.email,
+        })
+  
+        expect(response.statusCode).toBe(400)
+        expect(response.body).toMatchObject({
+          ok: false,
+          error: {
+            name: 'ValidationError',
+            message: i18n.__('must-be-equal', {
+              field1: i18n.__('user.fields.password'),
+              field2: i18n.__('user.fields.confirm-password').toLowerCase()
+            })
+          }
+        })
       })
     })
   })

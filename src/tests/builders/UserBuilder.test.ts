@@ -1,10 +1,7 @@
 import { userFactory } from '@cig-platform/factories'
 
-import UserBuilder from '@Builders/UserBuilder'
+import UserBuilder, { EXTERNAL_REGISTER_TYPES } from '@Builders/UserBuilder'
 import i18n from '@Configs/i18n'
-import { UserRegisterTypeEnum } from '@cig-platform/enums'
-
-const EXTERNAL_REGISTER_TYPES = [UserRegisterTypeEnum.Facebook, UserRegisterTypeEnum.Gmail]
 
 describe('UserBuilder', () => {
   describe('.build', () => {
