@@ -301,48 +301,6 @@ describe('User actions', () => {
   })
 
   describe('Authentication', () => {
-    it('is valid user credentials', async () => {
-      const user = userFactory()
-
-      jest.spyOn(typeorm, 'getCustomRepository').mockReturnValue({
-        findByEmail: jest.fn().mockResolvedValue({ ...user, password: EncryptService.encrypt(user.password) }),
-      })
-
-      const response = await request(App).post('/v1/auth').send({
-        email: user.email,
-        password: user.password
-      })
-
-      expect(response.statusCode).toBe(200)
-      expect(response.body).toMatchObject({
-        ok: true,
-        message: i18n.__('messages.success-login'),
-      })
-    })
-
-    it('is valid user credentials when is facebook login', async () => {
-      const user = userFactory()
-
-      jest.spyOn(typeorm, 'getCustomRepository').mockReturnValue({
-        findByEmail: jest.fn().mockResolvedValue({
-          ...user,
-          externalId: user.externalId
-        }),
-      })
-
-      const response = await request(App).post('/v1/auth').send({
-        email: user.email,
-        type: UserRegisterTypeEnum.Facebook,
-        externalId: user.externalId
-      })
-
-      expect(response.statusCode).toBe(200)
-      expect(response.body).toMatchObject({
-        ok: true,
-        message: i18n.__('messages.success-login'),
-      })
-    })
-
     it('is invalid user credentials when email does not exist', async () => {
       const user = userFactory()
 
@@ -365,25 +323,100 @@ describe('User actions', () => {
       })
     })
 
-    it('is invalid user credentials when password does not match', async () => {
-      const user = userFactory()
-
-      jest.spyOn(typeorm, 'getCustomRepository').mockReturnValue({
-        findByEmail: jest.fn().mockResolvedValue({ ...user, password: EncryptService.encrypt(user.password) }),
+    describe('default register type', () => {
+      it('is valid user credentials', async () => {
+        const user = userFactory()
+  
+        jest.spyOn(typeorm, 'getCustomRepository').mockReturnValue({
+          findByEmail: jest.fn().mockResolvedValue({ ...user, password: EncryptService.encrypt(user.password) }),
+        })
+  
+        const response = await request(App).post('/v1/auth').send({
+          email: user.email,
+          password: user.password
+        })
+  
+        expect(response.statusCode).toBe(200)
+        expect(response.body).toMatchObject({
+          ok: true,
+          message: i18n.__('messages.success-login'),
+        })
       })
 
-      const response = await request(App).post('/v1/auth').send({
-        email: user.email,
-        password: 'wrong password'
+      it('is invalid user credentials when password does not match', async () => {
+        const user = userFactory()
+  
+        jest.spyOn(typeorm, 'getCustomRepository').mockReturnValue({
+          findByEmail: jest.fn().mockResolvedValue({ ...user, password: EncryptService.encrypt(user.password) }),
+        })
+  
+        const response = await request(App).post('/v1/auth').send({
+          email: user.email,
+          password: 'wrong password'
+        })
+  
+        expect(response.statusCode).toBe(400)
+        expect(response.body).toMatchObject({
+          ok: false,
+          error: {
+            name: 'AuthError',
+            message: i18n.__('auth.errors.invalid-login')
+          }
+        })
       })
+    })
 
-      expect(response.statusCode).toBe(400)
-      expect(response.body).toMatchObject({
-        ok: false,
-        error: {
-          name: 'AuthError',
-          message: i18n.__('auth.errors.invalid-login')
-        }
+    EXTERNAL_REGISTER_TYPES.forEach(registerType => {
+      describe(`${registerType} register type`, () => {
+        it('is valid user credentials ', async () => {
+          const user = userFactory({ registerType })
+    
+          jest.spyOn(typeorm, 'getCustomRepository').mockReturnValue({
+            findByEmail: jest.fn().mockResolvedValue({
+              ...user,
+              externalId: user.externalId
+            }),
+          })
+    
+          const response = await request(App).post('/v1/auth').send({
+            email: user.email,
+            type: registerType,
+            externalId: user.externalId
+          })
+    
+          expect(response.statusCode).toBe(200)
+          expect(response.body).toMatchObject({
+            ok: true,
+            message: i18n.__('messages.success-login'),
+          })
+        })
+
+        it('is an invalid user credentials when external id does not match ', async () => {
+          const externalId = faker.datatype.uuid()
+          const user = userFactory({ registerType })
+    
+          jest.spyOn(typeorm, 'getCustomRepository').mockReturnValue({
+            findByEmail: jest.fn().mockResolvedValue({
+              ...user,
+              externalId: user.externalId
+            }),
+          })
+    
+          const response = await request(App).post('/v1/auth').send({
+            email: user.email,
+            type: registerType,
+            externalId
+          })
+    
+          expect(response.statusCode).toBe(400)
+          expect(response.body).toMatchObject({
+            ok: false,
+            error: {
+              name: 'AuthError',
+              message: i18n.__('auth.errors.invalid-login')
+            }
+          })
+        })
       })
     })
   })
