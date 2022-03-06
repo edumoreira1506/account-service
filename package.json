@@ -21,6 +21,7 @@
 	"homepage": "",
 	"dependencies": {
 		"@cig-platform/core": "^0.7.9",
+		"@cig-platform/decorators": "^0.0.2",
 		"@cig-platform/docs": "^0.4.6",
 		"@cig-platform/encrypt": "0.0.1",
 		"@cig-platform/enums": "0.0.5",
