@@ -4,32 +4,32 @@ import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn } from 'typeor
 @Entity('users')
 export default class User {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+    id: string
 
   @Column({ type: 'varchar', unique: true })
-  email: string;
+    email: string
 
   @Column('varchar')
-  password: string;
+    password: string
 
   @Column({ type: 'varchar', unique: false })
-  name: string;
+    name: string
 
   @Column('varchar')
-  register: string;
+    register: string
 
   @Column({ type: 'uuid', name: 'external_id' })
-  externalId: string;
+    externalId: string
 
   @Column({ type: 'varchar', name: 'register_type' })
-  registerType: string;
+    registerType: string
 
   @Column({ type: 'date', name: 'birth_date' })
-  birthDate: Date;
+    birthDate: Date
 
   @Column({ type: 'bool' })
-  active: boolean;
+    active: boolean
 
   @CreateDateColumn({ name: 'created_at' })
-  createdAt: Date;
+    createdAt: Date
 }

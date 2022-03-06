@@ -1,6 +1,6 @@
 import request from 'supertest'
 import typeorm from 'typeorm'
-import faker from 'faker'
+import faker from '@faker-js/faker'
 import { userFactory } from '@cig-platform/factories'
 
 import App from '@Configs/server'
@@ -9,6 +9,7 @@ import EncryptService from '@Services/EncryptService'
 
 import UserController from '@Controllers/UserController'
 import { UserRegisterTypeEnum } from '@cig-platform/enums'
+import { EXTERNAL_REGISTER_TYPES } from '@Builders/UserBuilder'
 
 jest.mock('typeorm', () => ({
   createConnection: jest.fn().mockResolvedValue({}),
@@ -27,6 +28,11 @@ jest.mock('typeorm', () => ({
 }))
 
 describe('User actions', () => {
+  afterEach(() => {
+    jest.resetAllMocks()
+    jest.clearAllMocks()
+  })
+
   describe('Register', () => {
     it('is a valid user', async () => {
       const mockSave = jest.fn()
@@ -60,40 +66,6 @@ describe('User actions', () => {
       }))
     })
 
-    it('is a valid user when is a facebook', async () => {
-      const mockSave = jest.fn()
-      const user = userFactory()
-
-      jest.spyOn(typeorm, 'getCustomRepository').mockReturnValue({
-        save: mockSave,
-        findByEmail: jest.fn().mockResolvedValue(null),
-        findById: jest.fn().mockResolvedValue(null),
-        findByRegister: jest.fn().mockResolvedValue(null),
-      })
-
-      const response = await request(App).post('/v1/users').send({
-        name: user.name,
-        email: user.email,
-        register: user.register,
-        birthDate: user.birthDate,
-        registerType: UserRegisterTypeEnum.Facebook,
-        externalId: user.externalId
-      })
-
-      expect(response.statusCode).toBe(200)
-      expect(response.body).toMatchObject({
-        message: i18n.__('messages.success'),
-        ok: true,
-      })
-      expect(mockSave).toHaveBeenCalledWith(expect.objectContaining({
-        name: user.name,
-        email: user.email,
-        register: user.register,
-        registerType: UserRegisterTypeEnum.Facebook,
-        externalId: user.externalId
-      }))
-    })
-
     it('is a invalid user when has no email', async () => {
       const user = userFactory()
       const response = await request(App).post('/v1/users').send({
@@ -110,49 +82,6 @@ describe('User actions', () => {
         error: {
           name: 'ValidationError',
           message: i18n.__('required-field', { field: i18n.__('user.fields.email') })
-        }
-      })
-    })
-
-    it('is a invalid user when has no password', async () => {
-      const user = userFactory()
-      const response = await request(App).post('/v1/users').send({
-        name: user.name,
-        register: user.register,
-        birthDate: user.birthDate,
-        email: user.email,
-      })
-
-      expect(response.statusCode).toBe(400)
-      expect(response.body).toMatchObject({
-        ok: false,
-        error: {
-          name: 'ValidationError',
-          message: i18n.__('user.errors.invalid-password')
-        }
-      })
-    })
-
-    it('is a invalid user when password is different from the password', async () => {
-      const user = userFactory()
-      const response = await request(App).post('/v1/users').send({
-        name: user.name,
-        register: user.register,
-        password: 'one',
-        confirmPassword: 'another',
-        birthDate: user.birthDate,
-        email: user.email,
-      })
-
-      expect(response.statusCode).toBe(400)
-      expect(response.body).toMatchObject({
-        ok: false,
-        error: {
-          name: 'ValidationError',
-          message: i18n.__('must-be-equal', {
-            field1: i18n.__('user.fields.password'),
-            field2: i18n.__('user.fields.confirm-password').toLowerCase()
-          })
         }
       })
     })
@@ -218,57 +147,173 @@ describe('User actions', () => {
         }
       })
     })
+
+    EXTERNAL_REGISTER_TYPES.forEach(registerType => {
+      it(`is a valid user when has no password and register type is ${registerType}`, async () => {
+        const mockSave = jest.fn()
+        const user = userFactory()
+  
+        jest.spyOn(typeorm, 'getCustomRepository').mockReturnValue({
+          save: mockSave,
+          findByEmail: jest.fn().mockResolvedValue(null),
+          findById: jest.fn().mockResolvedValue(null),
+          findByRegister: jest.fn().mockResolvedValue(null),
+        })
+  
+        const response = await request(App).post('/v1/users').send({
+          name: user.name,
+          email: user.email,
+          register: user.register,
+          birthDate: user.birthDate,
+          registerType: UserRegisterTypeEnum.Facebook,
+          externalId: user.externalId
+        })
+  
+        expect(response.statusCode).toBe(200)
+        expect(response.body).toMatchObject({
+          message: i18n.__('messages.success'),
+          ok: true,
+        })
+        expect(mockSave).toHaveBeenCalledWith(expect.objectContaining({
+          name: user.name,
+          email: user.email,
+          register: user.register,
+          registerType: UserRegisterTypeEnum.Facebook,
+          externalId: user.externalId
+        }))
+      })
+    })
+
+    describe('default register type', () => {
+      it('is a invalid user when has no password and', async () => {
+        const user = userFactory({ registerType: UserRegisterTypeEnum.Default })
+        const response = await request(App).post('/v1/users').send({
+          name: user.name,
+          register: user.register,
+          birthDate: user.birthDate,
+          email: user.email,
+          registerType: user.registerType
+        })
+  
+        expect(response.statusCode).toBe(400)
+        expect(response.body).toMatchObject({
+          ok: false,
+          error: {
+            name: 'ValidationError',
+            message: i18n.__('user.errors.invalid-password')
+          }
+        })
+      })
+  
+      it('is a invalid user when password is different from the password', async () => {
+        const user = userFactory()
+        const response = await request(App).post('/v1/users').send({
+          name: user.name,
+          register: user.register,
+          password: 'one',
+          confirmPassword: 'another',
+          birthDate: user.birthDate,
+          email: user.email,
+        })
+  
+        expect(response.statusCode).toBe(400)
+        expect(response.body).toMatchObject({
+          ok: false,
+          error: {
+            name: 'ValidationError',
+            message: i18n.__('must-be-equal', {
+              field1: i18n.__('user.fields.password'),
+              field2: i18n.__('user.fields.confirm-password').toLowerCase()
+            })
+          }
+        })
+      })
+    })
+  })
+
+  describe('Rollback', () => {
+    it('returns OK when user exists and the rollback time is not expired yet', async () => {
+      const user = { ...userFactory(), createdAt: new Date() }
+      const fakeUserRepository: any = {
+        findById: jest.fn().mockResolvedValue(user),
+        delete: jest.fn(),
+      }
+
+      jest.spyOn(UserController, 'repository', 'get').mockReturnValue(fakeUserRepository)
+
+      const response = await request(App).post(`/v1/users/${user.id}/rollback`)
+
+      expect(response.statusCode).toBe(200)
+      expect(response.body).toMatchObject({
+        ok: true,
+        message: i18n.__('messages.removed')
+      })
+      expect(fakeUserRepository.delete).toHaveBeenCalledWith({ id: user.id })
+      expect(fakeUserRepository.findById).toHaveBeenCalledWith(user.id)
+    })
+
+    it('returns not found error when user does not exist', async () => {
+      const user = null
+      const userId = faker.datatype.uuid()
+      const fakeUserRepository: any = {
+        findById: jest.fn().mockResolvedValue(user),
+        delete: jest.fn(),
+      }
+
+      jest.spyOn(UserController, 'repository', 'get').mockReturnValue(fakeUserRepository)
+
+      const response = await request(App).post(`/v1/users/${userId}/rollback`)
+
+      expect(response.statusCode).toBe(400)
+      expect(response.body).toMatchObject({
+        ok: false,
+        error: {
+          name: 'NotFoundError',
+          message: i18n.__('errors.not-found')
+        }
+      })
+      expect(fakeUserRepository.findById).toHaveBeenCalledWith(userId)
+      expect(fakeUserRepository.delete).not.toHaveBeenCalled()
+    })
+
+    it('returns expired error when the time to rollback user is expired', async () => {
+      const second = 1000
+      const minute = 60 * second
+      const nowDate = new Date()
+      const oneHourAgoDate = new Date(nowDate.getTime() - (60 * minute))
+      const user = { ...userFactory(), createdAt: oneHourAgoDate }
+      const userId = faker.datatype.uuid()
+      const fakeUserRepository: any = {
+        findById: jest.fn().mockResolvedValue(user),
+        delete: jest.fn(),
+      }
+
+      jest.spyOn(UserController, 'repository', 'get').mockReturnValue(fakeUserRepository)
+
+      const response = await request(App).post(`/v1/users/${userId}/rollback`)
+
+      expect(response.statusCode).toBe(400)
+      expect(response.body).toMatchObject({
+        ok: false,
+        error: {
+          name: 'Error',
+          message: i18n.__('rollback.errors.expired')
+        }
+      })
+      expect(fakeUserRepository.findById).toHaveBeenCalledWith(userId)
+      expect(fakeUserRepository.delete).not.toHaveBeenCalled()
+    })
   })
 
   describe('Authentication', () => {
-    it('is valid user credentials', async () => {
-      const user = userFactory()
-
-      jest.spyOn(typeorm, 'getCustomRepository').mockReturnValue({
-        findByEmail: jest.fn().mockResolvedValue({ ...user, password: EncryptService.encrypt(user.password) }),
-      })
-
-      const response = await request(App).post('/v1/auth').send({
-        email: user.email,
-        password: user.password
-      })
-
-      expect(response.statusCode).toBe(200)
-      expect(response.body).toMatchObject({
-        ok: true,
-        message: i18n.__('messages.success-login'),
-      })
-    })
-
-    it('is valid user credentials when is facebook login', async () => {
-      const user = userFactory()
-
-      jest.spyOn(typeorm, 'getCustomRepository').mockReturnValue({
-        findByEmail: jest.fn().mockResolvedValue({
-          ...user,
-          externalId: user.externalId
-        }),
-      })
-
-      const response = await request(App).post('/v1/auth').send({
-        email: user.email,
-        type: UserRegisterTypeEnum.Facebook,
-        externalId: user.externalId
-      })
-
-      expect(response.statusCode).toBe(200)
-      expect(response.body).toMatchObject({
-        ok: true,
-        message: i18n.__('messages.success-login'),
-      })
-    })
-
     it('is invalid user credentials when email does not exist', async () => {
       const user = userFactory()
 
-      jest.spyOn(typeorm, 'getCustomRepository').mockReturnValue({
+      const fakeUserRepository: any = {
         findByEmail: jest.fn().mockResolvedValue(null),
-      })
+      }
+
+      jest.spyOn(UserController, 'repository', 'get').mockReturnValue(fakeUserRepository)
 
       const response = await request(App).post('/v1/auth').send({
         email: user.email,
@@ -285,25 +330,108 @@ describe('User actions', () => {
       })
     })
 
-    it('is invalid user credentials when password does not match', async () => {
-      const user = userFactory()
-
-      jest.spyOn(typeorm, 'getCustomRepository').mockReturnValue({
-        findByEmail: jest.fn().mockResolvedValue({ ...user, password: EncryptService.encrypt(user.password) }),
-      })
-
-      const response = await request(App).post('/v1/auth').send({
-        email: user.email,
-        password: 'wrong password'
-      })
-
-      expect(response.statusCode).toBe(400)
-      expect(response.body).toMatchObject({
-        ok: false,
-        error: {
-          name: 'AuthError',
-          message: i18n.__('auth.errors.invalid-login')
+    describe('default register type', () => {
+      it('is valid user credentials', async () => {
+        const user = userFactory()
+  
+        const fakeUserRepository: any = {
+          findByEmail: jest.fn().mockResolvedValue({ ...user, password: EncryptService.encrypt(user.password) }),
         }
+  
+        jest.spyOn(UserController, 'repository', 'get').mockReturnValue(fakeUserRepository)
+
+        const response = await request(App).post('/v1/auth').send({
+          email: user.email,
+          password: user.password
+        })
+  
+        expect(response.statusCode).toBe(200)
+        expect(response.body).toMatchObject({
+          ok: true,
+          message: i18n.__('messages.success-login'),
+        })
+      })
+
+      it('is invalid user credentials when password does not match', async () => {
+        const user = userFactory()
+  
+        const fakeUserRepository: any = {
+          findByEmail: jest.fn().mockResolvedValue({ ...user, password: EncryptService.encrypt(user.password) }),
+        }
+  
+        jest.spyOn(UserController, 'repository', 'get').mockReturnValue(fakeUserRepository)
+
+        const response = await request(App).post('/v1/auth').send({
+          email: user.email,
+          password: 'wrong password'
+        })
+  
+        expect(response.statusCode).toBe(400)
+        expect(response.body).toMatchObject({
+          ok: false,
+          error: {
+            name: 'AuthError',
+            message: i18n.__('auth.errors.invalid-login')
+          }
+        })
+      })
+    })
+
+    EXTERNAL_REGISTER_TYPES.forEach(registerType => {
+      describe(`${registerType} register type`, () => {
+        it('is valid user credentials ', async () => {
+          const user = userFactory({ registerType })
+    
+          const fakeUserRepository: any = {
+            findByEmail: jest.fn().mockResolvedValue({
+              ...user,
+              externalId: user.externalId
+            }),
+          }
+    
+          jest.spyOn(UserController, 'repository', 'get').mockReturnValue(fakeUserRepository)
+
+          const response = await request(App).post('/v1/auth').send({
+            email: user.email,
+            type: registerType,
+            externalId: user.externalId
+          })
+    
+          expect(response.statusCode).toBe(200)
+          expect(response.body).toMatchObject({
+            ok: true,
+            message: i18n.__('messages.success-login'),
+          })
+        })
+
+        it('is an invalid user credentials when external id does not match ', async () => {
+          const externalId = faker.datatype.uuid()
+          const user = userFactory({ registerType })
+    
+          const fakeUserRepository: any = {
+            findByEmail: jest.fn().mockResolvedValue({
+              ...user,
+              externalId: user.externalId
+            }),
+          }
+    
+          jest.spyOn(UserController, 'repository', 'get').mockReturnValue(fakeUserRepository)
+
+          const response = await request(App).post('/v1/auth').send({
+            email: user.email,
+            type: registerType,
+            externalId
+          })
+    
+          expect(response.statusCode).toBe(400)
+          expect(response.body).toMatchObject({
+            ok: false,
+            error: {
+              name: 'AuthError',
+              message: i18n.__('auth.errors.invalid-login')
+            }
+          })
+        })
       })
     })
   })
@@ -353,7 +481,6 @@ describe('User actions', () => {
         update: mockUpdate,
       }
 
-      jest.spyOn(typeorm, 'getCustomRepository').mockReturnValue(fakeUserRepository)
       jest.spyOn(UserController, 'repository', 'get').mockReturnValue(fakeUserRepository)
       jest.spyOn(EncryptService, 'encrypt').mockReturnValue(password)
 
@@ -384,7 +511,6 @@ describe('User actions', () => {
         update: mockUpdate,
       }
 
-      jest.spyOn(typeorm, 'getCustomRepository').mockReturnValue(fakeUserRepository)
       jest.spyOn(UserController, 'repository', 'get').mockReturnValue(fakeUserRepository)
       jest.spyOn(EncryptService, 'encrypt').mockReturnValue(encryptedPassword)
 

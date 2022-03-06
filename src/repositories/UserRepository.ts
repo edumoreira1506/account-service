@@ -1,11 +1,12 @@
 import { EntityRepository } from 'typeorm'
-import { FindEntityErrorHandler, BaseRepository, FindEntitiesErrorHandler } from '@cig-platform/core'
+import { BaseRepository } from '@cig-platform/core'
+import { ErrorHandler } from '@cig-platform/decorators'
 
 import User from '@Entities/UserEntity'
 
 @EntityRepository(User)
 export default class UserRepository extends BaseRepository<User> {
-  @FindEntitiesErrorHandler()
+  @ErrorHandler([])
   search({ email }: { email?: string } = {}) {
     const filter = {
       ...(email ? ({ email }) : ({}))
@@ -14,12 +15,12 @@ export default class UserRepository extends BaseRepository<User> {
     return this.find(filter)
   }
 
-  @FindEntityErrorHandler()
+  @ErrorHandler()
   findByEmail(email: string) {
     return this.findByField('email', email)
   }
 
-  @FindEntityErrorHandler()
+  @ErrorHandler()
   findByRegister(register: string) {
     return this.findByField('register', register)
   }
