@@ -3,6 +3,9 @@
 	"version": "0.1.0",
 	"description": "",
 	"main": "src/index.js",
+	"engines": {
+		"node": "16.14"
+	},
 	"scripts": {
 		"build": "babel src --extensions \".ts\" --out-dir build --copy-files --no-copy-ignored",
 		"dev": "ts-node-dev -r tsconfig-paths/register --respawn --ignore-watch node_modules --no-notify src/index.ts",
