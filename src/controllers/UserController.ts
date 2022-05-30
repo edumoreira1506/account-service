@@ -10,14 +10,13 @@ import UserRepository from '@Repositories/UserRepository'
 import AuthService from '@Services/AuthService'
 import EncryptService from '@Services/EncryptService'
 
-const removeUserPrivateFields = (user: User) => ({
+export const removeUserPrivateFields = (user: Partial<User>) => ({
   name: user?.name,
   email: user?.email,
   birthDate: user?.birthDate,
   register: user?.register,
   externalId: user?.externalId,
   id: user?.id,
-  createdAt: user?.createdAt,
 })
 
 class UserController extends BaseController<User, UserRepository>  {
