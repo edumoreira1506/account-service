@@ -10,6 +10,16 @@ import UserRepository from '@Repositories/UserRepository'
 import AuthService from '@Services/AuthService'
 import EncryptService from '@Services/EncryptService'
 
+const removeUserPrivateFields = (user: User) => ({
+  name: user?.name,
+  email: user?.email,
+  birthDate: user?.birthDate,
+  register: user?.register,
+  externalId: user?.externalId,
+  id: user?.id,
+  createdAt: user?.createdAt,
+})
+
 class UserController extends BaseController<User, UserRepository>  {
   constructor(repository: ObjectType<User>) {
     super(repository)
@@ -40,15 +50,7 @@ class UserController extends BaseController<User, UserRepository>  {
     return res.send({
       ok: true,
       message: i18n.__('messages.success'),
-      user: {
-        name: user?.name,
-        email: user?.email,
-        birthDate: user?.birthDate,
-        register: user?.register,
-        externalId: user?.externalId,
-        id: user?.id,
-        createdAt: user?.createdAt,
-      }
+      user: removeUserPrivateFields(user)
     })
   }
 
@@ -125,7 +127,7 @@ class UserController extends BaseController<User, UserRepository>  {
 
     if (!user) throw new NotFoundError()
 
-    return BaseController.successResponse(res, { user })
+    return BaseController.successResponse(res, { user: removeUserPrivateFields(user) })
   }
 
   @BaseController.errorHandler()
@@ -134,7 +136,7 @@ class UserController extends BaseController<User, UserRepository>  {
 
     const users = await this.repository.search({ email })
 
-    return BaseController.successResponse(res, { users })
+    return BaseController.successResponse(res, { users: users.map(removeUserPrivateFields) })
   }
 }
 
