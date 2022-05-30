@@ -41,13 +41,13 @@ class UserController extends BaseController<User, UserRepository>  {
       ok: true,
       message: i18n.__('messages.success'),
       user: {
-        name: user.name,
-        email: user.email,
-        birthDate: user.birthDate,
-        register: user.register,
-        externalId: user.externalId,
-        id: user.id,
-        createdAt: user.createdAt,
+        name: user?.name,
+        email: user?.email,
+        birthDate: user?.birthDate,
+        register: user?.register,
+        externalId: user?.externalId,
+        id: user?.id,
+        createdAt: user?.createdAt,
       }
     })
   }
