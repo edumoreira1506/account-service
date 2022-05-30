@@ -7,7 +7,7 @@ import App from '@Configs/server'
 import i18n from '@Configs/i18n'
 import EncryptService from '@Services/EncryptService'
 
-import UserController from '@Controllers/UserController'
+import UserController, { removeUserPrivateFields } from '@Controllers/UserController'
 import { UserRegisterTypeEnum } from '@cig-platform/enums'
 import { EXTERNAL_REGISTER_TYPES } from '@Builders/UserBuilder'
 
@@ -734,7 +734,7 @@ describe('User actions', () => {
       expect(response.body).toMatchObject({
         ok: true,
         user: {
-          ...user,
+          ...removeUserPrivateFields(user),
           birthDate: user.birthDate?.toISOString()
         },
       })
@@ -756,7 +756,7 @@ describe('User actions', () => {
       expect(response.body).toMatchObject({
         ok: true,
         users: users.map((user) => ({
-          ...user,
+          ...removeUserPrivateFields(user),
           birthDate: user.birthDate.toISOString()
         }))
       })
