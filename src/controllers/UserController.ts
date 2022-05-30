@@ -37,7 +37,19 @@ class UserController extends BaseController<User, UserRepository>  {
 
     const user = await this.repository.save(userDTO)
 
-    return res.send({ ok: true, message: i18n.__('messages.success'), user })
+    return res.send({
+      ok: true,
+      message: i18n.__('messages.success'),
+      user: {
+        name: user?.name,
+        email: user?.email,
+        birthDate: user?.birthDate,
+        register: user?.register,
+        externalId: user?.externalId,
+        id: user?.id,
+        createdAt: user?.createdAt,
+      }
+    })
   }
 
   @BaseController.errorHandler()
