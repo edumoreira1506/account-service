@@ -107,7 +107,13 @@ class UserController extends BaseController<User, UserRepository>  {
       .setRegisterType(user.registerType)
       .build()
 
-    await this.repository.update({ id: user.id }, userDTO)
+    await this.repository.update({ id: user.id }, {
+      name: userDTO.name,
+      password: userDTO.password,
+      email: userDTO.email,
+      birthDate: userDTO.birthDate,
+      register: userDTO.register,
+    })
   }
 
   @BaseController.errorHandler()
