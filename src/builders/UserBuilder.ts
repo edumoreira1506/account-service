@@ -79,7 +79,7 @@ export default class UserBuilder {
   }
 
   get isDefaultRegisterType() {
-    return this._registerType === UserRegisterTypeEnum.Default
+    return this._registerType === UserRegisterTypeEnum.Default || !this._registerType
   }
 
   validate = async(): Promise<void> => {
