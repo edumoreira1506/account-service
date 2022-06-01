@@ -94,7 +94,7 @@ class UserController extends BaseController<User, UserRepository>  {
 
     if (!user) throw new NotFoundError()
 
-    const password = req.body?.password ?? EncryptService.decrypt(user.password)
+    const password = req.body?.password ?? (user.password && EncryptService.decrypt(user.password))
     const newUser = { ...user, ...req.body, password }
     const userDTO = await new UserBuilder(this.repository)
       .setName(newUser.name)
@@ -105,6 +105,7 @@ class UserController extends BaseController<User, UserRepository>  {
       .setId(user.id)
       .setActive(user.active)
       .setRegisterType(user.registerType)
+      .setExternalId(user.externalId)
       .build()
 
     await this.repository.update({ id: user.id }, {
