@@ -23,7 +23,7 @@
 	"bugs": {},
 	"homepage": "",
 	"dependencies": {
-		"@cig-platform/core": "^0.7.9",
+		"@cig-platform/core": "^0.10.13",
 		"@cig-platform/decorators": "^0.0.2",
 		"@cig-platform/docs": "^0.4.6",
 		"@cig-platform/encrypt": "0.0.1",
