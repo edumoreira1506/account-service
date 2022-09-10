@@ -15,12 +15,12 @@ export default class UserBuilder {
   private _register = ''
   private _id: undefined | string = undefined
   private _birthDate: Date
-  private _repository: UserRepository
+  private _repository: typeof UserRepository
   private _active = true
   private _registerType: string = UserRegisterTypeEnum.Default
   private _externalId = ''
 
-  constructor(userRepository: UserRepository) {
+  constructor(userRepository: typeof UserRepository) {
     this._repository = userRepository
   }
 
@@ -90,7 +90,7 @@ export default class UserBuilder {
     if (!this.isDefaultRegisterType && !this._externalId) {
       throw new ValidationError(i18n.__('user.errors.invalid-external-id'))
     }
-
+    
     if (this._email) {
       const userOfEmail = await this._repository.findByEmail(this._email)
       const isDuplicatedEmail = Boolean(userOfEmail) && userOfEmail?.id !== this._id
