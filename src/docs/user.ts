@@ -7,13 +7,15 @@ const userDocs = {
       method: 'post',
       title: 'Auth user',
       objectSchema: authUserSchema,
+      headerParams: [{ type: 'string', name: 'Cig-Api-Key' }]
     }
   ]),
   ...createDoc('/users', ['Users'], [
     {
       method: 'post',
       title: 'Create user',
-      objectSchema: storeUserSchema
+      objectSchema: storeUserSchema,
+      headerParams: [{ type: 'string', name: 'Cig-Api-Key' }]
     },
     {
       method: 'get',
@@ -21,7 +23,8 @@ const userDocs = {
       queryParams: [{
         name: 'email',
         type: 'string',
-      }]
+      }],
+      headerParams: [{ type: 'string', name: 'Cig-Api-Key' }]
     }
   ]),
   ...createDoc('/users/{userId}', ['Users'], [
@@ -29,14 +32,17 @@ const userDocs = {
       method: 'patch',
       title: 'Update user',
       objectSchema: updateUserSchema,
+      headerParams: [{ type: 'string', name: 'Cig-Api-Key' }]
     },
     {
       method: 'delete',
       title: 'Delete user',
+      headerParams: [{ type: 'string', name: 'Cig-Api-Key' }]
     },
     {
       method: 'get',
       title: 'Get user',
+      headerParams: [{ type: 'string', name: 'Cig-Api-Key' }]
     }
   ], {
     pathVariables: [{ type: 'string', name: 'userId' }]
@@ -45,6 +51,7 @@ const userDocs = {
     {
       method: 'post',
       title: 'Rollback user register',
+      headerParams: [{ type: 'string', name: 'Cig-Api-Key' }]
     },
   ], {
     pathVariables: [{ type: 'string', name: 'userId' }]

@@ -1,5 +1,4 @@
 import { Request, Response } from 'express'
-import { ObjectType } from 'typeorm'
 import { ApiError, BaseController, NotFoundError } from '@cig-platform/core'
 
 import { UserRequest } from '@Types/requests'
@@ -19,10 +18,12 @@ export const removeUserPrivateFields = (user: Partial<User>) => ({
   id: user?.id,
 })
 
-class UserController extends BaseController<User, UserRepository>  {
-  constructor(repository: ObjectType<User>) {
-    super(repository)
+class UserController  {
+  private repository: any
 
+  constructor(_repository: typeof UserRepository) {
+    this.repository = _repository
+    
     this.store = this.store.bind(this)
     this.auth = this.auth.bind(this)
     this.update = this.update.bind(this)

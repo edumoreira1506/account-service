@@ -15,7 +15,7 @@ export default class AuthService {
     password?: string;
     type?: string;
     externalId?: string;
-  }, userRepository: UserRepository) {
+  }, userRepository: typeof UserRepository) {
     const user = await userRepository.findByEmail(email)
 
     if (!user) throw new AuthError()
